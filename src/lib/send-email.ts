@@ -14,7 +14,7 @@ export const sendEmail = async ({ to, subject, text }: SendEmailOptions) => {
       secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
       auth: {
         user: process.env.NEXT_PUBLIC_APP_EMAIL,
-        pass: process.env.NEXT_PUBLIC_APP_PASSWORD,
+        pass: process.env.NEXT_PUBLIC_APP_PASS,
       },
     });
 
