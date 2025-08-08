@@ -1,0 +1,22 @@
+// backend 
+
+District // City/Upazila
+
+
+// frontend
+context api
+tenstack query
+next-auth
+
+// need to get from client
+uri
+next auth value
+
+
+
+
+
+// for get app password
+https://myaccount.google.com/apppasswords
+// bulk message dosc
+https://bulksmsbd.com/bulksms-api-bangladesh.php
