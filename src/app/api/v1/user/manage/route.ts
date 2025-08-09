@@ -65,6 +65,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const { identifier, code } = await request.json();
     await connectDb();
+    console.log(identifier, code);
 
     const otpEntry = await OtpModel.findOne({ identifier, code });
 

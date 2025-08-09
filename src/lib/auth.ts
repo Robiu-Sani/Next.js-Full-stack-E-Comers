@@ -17,7 +17,7 @@ export const auth = async (...requiredRoles: TUserRole[]) => {
   try {
     decoded = jwt.verify(
       tokenCookie.value,
-      process.env.JWT_ACCESS_SECRET as string
+      process.env.NEXT_PUBLIC_JWT_ACCESS_SECRET as string
     ) as JwtPayload;
   } catch (err: any) {
     console.log(err);
@@ -54,8 +54,10 @@ export const auth = async (...requiredRoles: TUserRole[]) => {
   }
 
   if (
-    requiredRoles.length > 0 &&
-    !requiredRoles.includes(decoded.role as TUserRole)
+    !(
+      requiredRoles.length > 0 &&
+      !requiredRoles.includes(decoded.role as TUserRole)
+    )
   ) {
     throw new Error("You are not authorized to access this resource");
   }

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +9,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ICategory } from "@/interface/category.interface";
 import Image from "next/image";
 import SingleImageUpload from "@/shired-component/SingleImageUpload";
+import { toast } from "sonner";
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+  data?: ICategory;
+  error?: string;
+}
 
 export default function AddCategoryForm() {
-  const [formData, setFormData] = useState<Partial<ICategory>>({
+  const [formData, setFormData] = useState<Omit<ICategory, "id">>({
     name: "",
     image: "",
     note: "",
@@ -28,26 +38,52 @@ export default function AddCategoryForm() {
     setFormData((prev) => ({ ...prev, image: imageUrl }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.name) {
+      toast.error("Category name is required");
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Log form data to console
-    console.log("Form Data:", formData);
+    try {
+      const res = await fetch("/api/v1/category", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+        cache: "no-store",
+      });
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Category added successfully! Check console for data.");
+      const data: ApiResponse = await res.json();
 
-      // Reset form
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create category");
+      }
+
+      toast.success("Category created successfully", {
+        description: data.message || "Your category has been added",
+      });
+
       setFormData({
         name: "",
         image: "",
         note: "",
         isDeleted: false,
       });
-    }, 1000);
+    } catch (error: unknown) {
+      console.error("Error creating category:", error);
+      toast.error("Failed to create category", {
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,26 +95,31 @@ export default function AddCategoryForm() {
             <Input
               id="name"
               name="name"
-              value={formData.name || ""}
+              value={formData.name}
               onChange={handleInputChange}
               placeholder="Enter category name"
               required
+              disabled={isSubmitting}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="image">Category Image</Label>
-            <SingleImageUpload onUpload={handleImageUpload} />
+            <SingleImageUpload
+              onUpload={handleImageUpload}
+              disabled={isSubmitting}
+            />
             {formData.image && (
               <div className="mt-2">
                 <p className="text-sm text-gray-600 mb-1">Preview:</p>
-                <Image
-                  width={100}
-                  height={100}
-                  src={formData.image}
-                  alt="Category preview"
-                  className="w-20 h-20 object-cover rounded-md border"
-                />
+                <div className="w-20 h-20 relative">
+                  <Image
+                    fill
+                    src={formData.image}
+                    alt="Category preview"
+                    className="object-cover rounded-md border"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -88,14 +129,20 @@ export default function AddCategoryForm() {
             <Textarea
               id="note"
               name="note"
-              value={formData.note || ""}
+              value={formData.note}
               onChange={handleInputChange}
               placeholder="Enter any additional notes"
               rows={3}
+              disabled={isSubmitting}
             />
           </div>
 
-          <Button type="submit" disabled={isSubmitting} className="w-full">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full"
+            aria-disabled={isSubmitting}
+          >
             {isSubmitting ? "Adding Category..." : "Add Category"}
           </Button>
         </form>

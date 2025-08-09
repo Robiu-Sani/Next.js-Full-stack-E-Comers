@@ -11,11 +11,13 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
       trim: true,
       lowercase: true,
       unique: true,
+      sparse: true,
     },
     number: {
       type: String,
       trim: true,
       unique: true,
+      sparse: true,
     },
     username: {
       type: String,
@@ -23,8 +25,9 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
     },
     password: {
       type: String,
-      required: true,
-      default: "12345678",
+      required: function () {
+        return !this.isSocial; // required only if NOT social user
+      },
     },
     role: {
       type: String,
@@ -54,9 +57,18 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
   }
 );
 
-// 2. Hash password before saving
+// 2. Hash password before saving, only if modified and password is provided
 userSchema.pre("save", async function (next) {
-  const user = this as Iuser;
+  const user = this as any;
+
+  if (!user.isModified("password")) {
+    return next();
+  }
+
+  if (!user.password) {
+    // No password to hash (social login user)
+    return next();
+  }
 
   try {
     const salt = await bcrypt.genSalt(10);

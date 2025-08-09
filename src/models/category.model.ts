@@ -10,6 +10,7 @@ const CategorySchema: Schema = new Schema<ICategory>(
     },
     image: {
       type: String,
+      default: "https://i.postimg.cc/9MFs16kQ/category.jpg",
     },
     note: {
       type: String,

@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import { cookies } from "next/headers";
 
-const getData = async (path: string) => {
+const postData = async (path: string, data: any) => {
   try {
     // Get access token from cookies
     const cookieStore = await cookies();
@@ -15,12 +16,13 @@ const getData = async (path: string) => {
 
     // Make the API request
     const response = await fetch(path, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      cache: "no-store", // Add this to prevent caching of authenticated requests
+      body: JSON.stringify(data),
+      cache: "no-store", // Prevent caching of authenticated requests
     });
 
     // Handle HTTP errors
@@ -38,4 +40,4 @@ const getData = async (path: string) => {
   }
 };
 
-export default getData;
+export default postData;
