@@ -51,6 +51,11 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
       type: Boolean,
       default: false,
     },
+    activationExpiresAt: {
+      type: Date,
+      default: undefined,
+      index: { expireAfterSeconds: 0 }, // TTL index to delete after expiry
+    },
   },
   {
     timestamps: true,

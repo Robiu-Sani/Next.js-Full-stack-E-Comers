@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     if (!isSocial) {
       const identifier = email || number;
       const otp = generateOTP();
-      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
       await OtpModel.create({ identifier, code: otp, expiresAt });
 
