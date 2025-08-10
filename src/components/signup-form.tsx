@@ -103,8 +103,7 @@ export default function SignupForm({
         toast.success("Account created!", {
           description: "Please verify your account",
         });
-        const identifier = email || number;
-        router.push(`/sign-up/${encodeURIComponent(identifier)}`);
+        router.push(`/sign-up/${email || number}`);
       } else {
         toast.error(data.error || "Registration failed");
       }
