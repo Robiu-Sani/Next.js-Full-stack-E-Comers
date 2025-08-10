@@ -15,7 +15,7 @@ import { toast } from "sonner";
 export default function OtpForm() {
   const router = useRouter();
   const params = useParams();
-  const identifier = params.identifier as string;
+  const identifier = decodeURIComponent(params.identifier as string);
 
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,6 +31,7 @@ export default function OtpForm() {
     }
 
     setIsSubmitting(true);
+    console.log({ identifier, code: otp });
     try {
       const res = await fetch("/api/v1/user/manage", {
         method: "PATCH",

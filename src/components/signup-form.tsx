@@ -28,7 +28,6 @@ const registerData = async (
   path: string,
   data: RegisterPayload
 ): Promise<Response> => {
-  console.log(data);
   const response = await fetch(path, {
     method: "POST",
     headers: {
@@ -103,7 +102,8 @@ export default function SignupForm({
         toast.success("Account created!", {
           description: "Please verify your account",
         });
-        router.push(`/sign-up/${email || number}`);
+        const identifier = email || number;
+        router.push(`/sign-up/${encodeURIComponent(identifier)}`);
       } else {
         toast.error(data.error || "Registration failed");
       }
