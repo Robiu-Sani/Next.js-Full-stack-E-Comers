@@ -54,10 +54,8 @@ export const auth = async (...requiredRoles: TUserRole[]) => {
   }
 
   if (
-    !(
-      requiredRoles.length > 0 &&
-      !requiredRoles.includes(decoded.role as TUserRole)
-    )
+    requiredRoles.length > 0 &&
+    !requiredRoles.includes(decoded.role as TUserRole)
   ) {
     throw new Error("You are not authorized to access this resource");
   }
