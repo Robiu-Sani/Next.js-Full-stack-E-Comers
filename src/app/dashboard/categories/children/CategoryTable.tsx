@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import EditCategory from "./EditCategory";
-import Loading from "@/shired-component/Loading";
 
 export interface ICategory {
   _id: string;
@@ -188,7 +187,9 @@ export default function CategoryTable() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  <Loading />
+                  <div className="w-full flex justify-center items-center">
+                    <RefreshCw className="animate-spin w-12" />
+                  </div>
                 </TableCell>
               </TableRow>
             ) : filteredCategories.length > 0 ? (

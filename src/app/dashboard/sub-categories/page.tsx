@@ -1,5 +1,10 @@
 import React from "react";
+import ParentsSubCategory from "./ParentsSubCategory";
 
 export default function page() {
-  return <div>page</div>;
+  return (
+    <div>
+      <ParentsSubCategory />
+    </div>
+  );
 }

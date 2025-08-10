@@ -1,15 +1,21 @@
 import { ISubCategory } from "@/interface/sub-category.interace";
 import { Schema, models, model } from "mongoose";
 
-const SubCategorySchema: Schema = new Schema<ISubCategory>(
+const SubCategorySchema = new Schema<ISubCategory>(
   {
     name: {
       type: String,
       required: true,
       trim: true,
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Category",
+    },
     note: {
       type: String,
+      trim: true,
     },
     isDeleted: {
       type: Boolean,
