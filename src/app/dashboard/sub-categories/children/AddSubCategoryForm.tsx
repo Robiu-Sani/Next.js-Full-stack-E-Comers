@@ -10,18 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ICategory } from "@/interface/category.interface";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,13 +49,11 @@ export default function AddSubCategoryForm() {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [categorySearch, setCategorySearch] = useState("");
-  const [open, setOpen] = useState(false);
 
-  // Fetch categories with search and limit
+  // Fetch categories when search changes
   useEffect(() => {
     const fetchCategories = async () => {
       setIsLoadingCategories(true);
-
       try {
         const url = new URL("/api/v1/category", window.location.origin);
         url.searchParams.append("search", categorySearch);
@@ -78,9 +69,6 @@ export default function AddSubCategoryForm() {
         const data: ApiResponse<ICategory[]> = await res.json();
         if (res.ok && data.success && data.data) {
           setCategories(data.data);
-          if (data.data.length === 0 && categorySearch) {
-            toast.info("No categories found for the search term");
-          }
         } else {
           toast.error(data.message || "Failed to load categories");
         }
@@ -110,8 +98,6 @@ export default function AddSubCategoryForm() {
       ...prev,
       category: catId,
     }));
-    setCategorySearch("");
-    setOpen(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,17 +172,15 @@ export default function AddSubCategoryForm() {
             />
           </div>
 
-          {/* Category Selection Combobox */}
+          {/* Category Selection */}
           <div className="space-y-2">
             <Label htmlFor="category">Select Category *</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
                   className="w-full justify-between"
-                  disabled={isSubmitting || isLoadingCategories}
+                  disabled={isSubmitting}
                 >
                   {isLoadingCategories ? (
                     <span className="flex items-center">
@@ -211,47 +195,47 @@ export default function AddSubCategoryForm() {
                   )}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0 z-[1002]">
-                <Command>
-                  <CommandInput
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64 max-h-72 overflow-auto p-2">
+                <div className="mb-2">
+                  <Input
                     placeholder="Search category..."
                     value={categorySearch}
-                    onValueChange={setCategorySearch}
+                    onChange={(e) => setCategorySearch(e.target.value)}
+                    className="h-8"
                   />
-                  <CommandList>
-                    {isLoadingCategories ? (
-                      <div className="flex items-center justify-center p-4">
-                        <Loader2 className="h-6 w-6 animate-spin" />
-                        <span className="ml-2">Loading categories...</span>
-                      </div>
-                    ) : categories.length == 0 ? (
-                      <CommandEmpty>No category found.</CommandEmpty>
-                    ) : (
-                      <CommandGroup className="pt-10">
-                        {categories.map((cat: any) => (
-                          <CommandItem
-                            key={cat._id}
-                            value={cat._id}
-                            onSelect={() => handleCategorySelect(cat._id)}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.category === cat._id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {cat.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    )}
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                </div>
+
+                {isLoadingCategories ? (
+                  <div className="flex items-center justify-center p-2 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Loading...
+                  </div>
+                ) : categories.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground">
+                    No categories found.
+                  </div>
+                ) : (
+                  categories.map((cat: any) => (
+                    <DropdownMenuItem
+                      key={cat._id}
+                      onSelect={() => handleCategorySelect(cat._id)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "h-4 w-4",
+                          formData.category === cat._id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                      {cat.name}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Notes */}

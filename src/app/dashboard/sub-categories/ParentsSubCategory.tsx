@@ -36,7 +36,7 @@ export default function ParentsSubCategory() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] ">
             <DialogHeader>
-              <DialogTitle>Create New Category</DialogTitle>
+              <DialogTitle>Create New Sub Category</DialogTitle>
             </DialogHeader>
             <AddSubCategoryForm />
           </DialogContent>
