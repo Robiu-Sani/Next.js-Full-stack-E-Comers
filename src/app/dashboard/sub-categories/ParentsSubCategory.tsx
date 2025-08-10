@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import AddSubCategoryForm from "./children/AddSubCategoryForm";
+import SubCategoryTable from "./children/SubCategoryTable";
 
 export default function ParentsSubCategory() {
   const [isSubDialogOpen, setIsSubDialogOpen] = useState(false);
 
   return (
     <div className="pt-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center mb-6 justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             Sub Category Management
@@ -42,7 +43,7 @@ export default function ParentsSubCategory() {
           </DialogContent>
         </Dialog>
       </div>
-      <h1>subcategory table</h1>
+      <SubCategoryTable />
     </div>
   );
 }
