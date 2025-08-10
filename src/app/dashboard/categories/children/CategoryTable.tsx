@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -23,9 +23,21 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import EditCategory from "./EditCategory";
+import Loading from "@/shired-component/Loading";
 
 export interface ICategory {
   _id: string;
@@ -37,135 +49,115 @@ export interface ICategory {
   updatedAt: Date;
 }
 
-// Dummy data
-const categoriesData: ICategory[] = [
-  {
-    _id: "1",
-    name: "Electronics",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "All electronic devices",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "2",
-    name: "Clothing",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Men's and women's clothing",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "3",
-    name: "Home & Garden",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Furniture and home decor",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "4",
-    name: "Books",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Fiction and non-fiction",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "5",
-    name: "Sports",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Sports equipment",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "6",
-    name: "Toys",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Children's toys",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "7",
-    name: "Beauty",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Cosmetics and skincare",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "8",
-    name: "Food & Beverage",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Groceries and drinks",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "9",
-    name: "Health",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Health supplements",
-    isDeleted: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: "10",
-    name: "Automotive",
-    image:
-      "https://img.freepik.com/free-vector/white-product-podium-with-green-tropical-palm-leaves-golden-round-arch-green-wall_87521-3023.jpg",
-    note: "Car parts and accessories",
-    isDeleted: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
 export default function CategoryTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [categoriesData, setCategoriesData] = useState<ICategory[]>([]);
+  const [totalCategories, setTotalCategories] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    null
+  );
+  const [isSubmiting, setIsSubmiting] = useState(false);
+  const [deleteInfo, setDeleteInfo] = useState(false);
+  const itemsPerPage = 50;
 
-  // Filter categories based on search term
+  // Fetch categories data
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch(
+          `/api/v1/category?search=${searchTerm}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
+
+        const data = await res.json();
+        if (data.success) {
+          setCategoriesData(data.data);
+          setTotalCategories(data.pagination.total);
+        } else {
+          toast.error("Failed to fetch categories");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Failed to fetch categories");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [searchTerm, currentPage]);
+
+  // Filter categories based on search term (client-side if needed)
   const filteredCategories = categoriesData.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-  const currentItems = filteredCategories.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(totalCategories / itemsPerPage);
 
   const handleEdit = (id: string) => {
-    console.log("Edit category with id:", id);
-    // Add your edit logic here
+    setSelectedCategoryId(id);
+    setEditDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    console.log("Delete category with id:", id);
-    // Add your delete logic here
+  const handleDeleteClick = (id: string, info: boolean) => {
+    setSelectedCategoryId(id);
+    setDeleteDialogOpen(true);
+    setDeleteInfo(info);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedCategoryId) return;
+    setIsSubmiting(true);
+    try {
+      const response = await fetch(`/api/v1/category/${selectedCategoryId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Category deleted successfully");
+        // Refresh the data
+        const res = await fetch(
+          `/api/v1/category?search=${searchTerm}&page=${currentPage}&limit=${itemsPerPage}`,
+          {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
+        const updatedData = await res.json();
+        if (updatedData.success) {
+          setCategoriesData(updatedData.data);
+          setTotalCategories(updatedData.pagination.total);
+        }
+      } else {
+        toast.error(data.message || "Failed to delete category");
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast.error("Failed to delete category");
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedCategoryId(null);
+      setIsSubmiting(false);
+    }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   return (
@@ -174,13 +166,10 @@ export default function CategoryTable() {
         <Input
           placeholder="Search categories..."
           value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // Reset to first page when searching
-          }}
+          onChange={handleSearch}
           className="max-w-sm"
         />
-        <Button variant="secondary">Total Data 30</Button>
+        <Button variant="secondary">Total Data {totalCategories}</Button>
       </div>
 
       <div className="rounded-md border">
@@ -196,8 +185,14 @@ export default function CategoryTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentItems.length > 0 ? (
-              currentItems.map((category) => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  <Loading />
+                </TableCell>
+              </TableRow>
+            ) : filteredCategories.length > 0 ? (
+              filteredCategories.map((category) => (
                 <TableRow key={category._id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
@@ -215,7 +210,7 @@ export default function CategoryTable() {
                     {category.note || "No description"}
                   </TableCell>
                   <TableCell>
-                    {category.createdAt.toLocaleDateString()}
+                    {new Date(category.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -242,10 +237,12 @@ export default function CategoryTable() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex items-center gap-2 text-red-600"
-                          onClick={() => handleDelete(category._id)}
+                          onClick={() =>
+                            handleDeleteClick(category._id, category.isDeleted)
+                          }
                         >
                           <Trash2 className="h-4 w-4" />
-                          Delete
+                          {category.isDeleted ? "ReStore" : "Delete"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -267,8 +264,8 @@ export default function CategoryTable() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
           Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredCategories.length)} of{" "}
-          {filteredCategories.length} categories
+          {Math.min(currentPage * itemsPerPage, totalCategories)} of{" "}
+          {totalCategories} categories
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -291,6 +288,72 @@ export default function CategoryTable() {
           </Button>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] z-[1001]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to {deleteInfo ? "ReStore" : "Delete"} this
+              category? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              className="flex justify-center items-center gap-2"
+            >
+              {isSubmiting ? (
+                <RefreshCw className="animate-spin text-white" />
+              ) : (
+                ""
+              )}
+              {deleteInfo ? "ReStore" : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-[625px] z-[1001]">
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+          {selectedCategoryId && (
+            <EditCategory
+              categoryId={selectedCategoryId}
+              onSuccess={() => {
+                setEditDialogOpen(false);
+                // Refresh data after successful edit
+                fetch(
+                  `/api/v1/category?search=${searchTerm}&page=${currentPage}&limit=${itemsPerPage}`,
+                  {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-store",
+                  }
+                )
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.success) {
+                      setCategoriesData(data.data);
+                      setTotalCategories(data.pagination.total);
+                    }
+                  });
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
