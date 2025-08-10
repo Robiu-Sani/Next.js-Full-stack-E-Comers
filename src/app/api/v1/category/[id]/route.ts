@@ -5,16 +5,20 @@ import connectDb from "@/lib/connectdb";
 import Category from "@/models/category.model";
 import { NextRequest, NextResponse } from "next/server";
 
+type ParamsType = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
 // GET: Get category by ID
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, context: ParamsType) {
+  const { id } = await context.params;
   try {
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN, USER_ROLE.MENAGER);
 
-    const category = await Category.findById(params.id);
+    const category = await Category.findById(id);
 
     if (!category || category.isDeleted) {
       return NextResponse.json(
@@ -33,10 +37,8 @@ export async function GET(
 }
 
 // PATCH: Update category by ID
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, context: ParamsType) {
+  const { id } = await context.params;
   try {
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN, USER_ROLE.MENAGER);
@@ -44,7 +46,7 @@ export async function PATCH(
     const body = await req.json();
 
     const updatedCategory = await Category.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: body },
       { new: true, runValidators: true }
     );
@@ -70,16 +72,14 @@ export async function PATCH(
 }
 
 // DELETE: Soft delete category by ID
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, context: ParamsType) {
+  const { id } = await context.params;
   try {
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN);
 
     // Find category first
-    const category = await Category.findById(params.id);
+    const category = await Category.findById(id);
 
     if (!category) {
       return NextResponse.json(
