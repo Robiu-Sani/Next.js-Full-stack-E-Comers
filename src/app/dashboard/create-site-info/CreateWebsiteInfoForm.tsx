@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, PlusIcon, Trash2Icon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import SingleImageUpload from "@/shired-component/SingleImageUpload";
 
 // Define validation schema
@@ -101,32 +101,12 @@ export default function CreateWebsiteInfoForm() {
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
-      // Format phone numbers
-      const formattedValues = {
-        ...values,
-        number: values.number.startsWith("+88")
-          ? values.number
-          : values.number.startsWith("88")
-          ? `+${values.number}`
-          : `+88${values.number}`,
-        socialContact: {
-          ...values.socialContact,
-          whatsApp: values.socialContact.whatsApp
-            ? values.socialContact.whatsApp.startsWith("+88")
-              ? values.socialContact.whatsApp
-              : values.socialContact.whatsApp.startsWith("88")
-              ? `+${values.socialContact.whatsApp}`
-              : `+88${values.socialContact.whatsApp}`
-            : "",
-        },
-      };
-
       const response = await fetch("/api/v1/web-info", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formattedValues),
+        body: JSON.stringify(values),
       });
 
       const data = await response.json();
@@ -148,75 +128,49 @@ export default function CreateWebsiteInfoForm() {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
+    <Card className="border-0 shadow-none p-0 w-full mx-auto mt-6">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Website Information
-        </CardTitle>
+        <CardTitle>Create Website Information</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Basic Information */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Basic Information</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Website Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Website Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email *</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="Email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="880..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Logo */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Logo</h3>
+            <div className="grid md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
-                name="logo"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Logo *</FormLabel>
+                    <FormLabel>Website Name *</FormLabel>
                     <FormControl>
-                      <SingleImageUpload
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
+                      <Input placeholder="Website Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+880..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -224,13 +178,31 @@ export default function CreateWebsiteInfoForm() {
               />
             </div>
 
+            {/* Logo */}
+            <FormField
+              control={form.control}
+              name="logo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Logo *</FormLabel>
+                  <FormControl>
+                    <SingleImageUpload
+                      onUpload={(url: string) => field.onChange(url)}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Banner Images */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Banner Images</h3>
+            <div className="space-y-4">
+              <h3 className="font-medium">Banner Images</h3>
 
               {/* First Image */}
               <div className="space-y-4">
-                <h4 className="font-medium">First Banner</h4>
+                <h4 className="text-sm font-medium">First Banner</h4>
                 <div className="grid md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -240,8 +212,8 @@ export default function CreateWebsiteInfoForm() {
                         <FormLabel>Image *</FormLabel>
                         <FormControl>
                           <SingleImageUpload
-                            value={field.value}
-                            onChange={field.onChange}
+                            onUpload={(url: string) => field.onChange(url)}
+                            disabled={isSubmitting}
                           />
                         </FormControl>
                         <FormMessage />
@@ -266,7 +238,7 @@ export default function CreateWebsiteInfoForm() {
 
               {/* Second Image */}
               <div className="space-y-4">
-                <h4 className="font-medium">Second Banner</h4>
+                <h4 className="text-sm font-medium">Second Banner</h4>
                 <div className="grid md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -276,8 +248,8 @@ export default function CreateWebsiteInfoForm() {
                         <FormLabel>Image *</FormLabel>
                         <FormControl>
                           <SingleImageUpload
-                            value={field.value}
-                            onChange={field.onChange}
+                            onUpload={(url: string) => field.onChange(url)}
+                            disabled={isSubmitting}
                           />
                         </FormControl>
                         <FormMessage />
@@ -302,9 +274,9 @@ export default function CreateWebsiteInfoForm() {
 
               {/* Carousel Images */}
               <div className="space-y-4">
-                <h4 className="font-medium">Carousel Banners</h4>
+                <h4 className="text-sm font-medium">Carousel Banners</h4>
                 {form.watch("banner.carousel").map((_, index) => (
-                  <div key={index} className="space-y-4">
+                  <div key={index} className="space-y-4 border p-4 rounded-lg">
                     <div className="grid md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -314,8 +286,8 @@ export default function CreateWebsiteInfoForm() {
                             <FormLabel>Image {index + 1} *</FormLabel>
                             <FormControl>
                               <SingleImageUpload
-                                value={field.value}
-                                onChange={field.onChange}
+                                onUpload={(url: string) => field.onChange(url)}
+                                disabled={isSubmitting}
                               />
                             </FormControl>
                             <FormMessage />
@@ -358,6 +330,7 @@ export default function CreateWebsiteInfoForm() {
                 <Button
                   type="button"
                   variant="outline"
+                  size="sm"
                   onClick={() => {
                     form.setValue("banner.carousel", [
                       ...form.getValues("banner.carousel"),
@@ -372,9 +345,9 @@ export default function CreateWebsiteInfoForm() {
             </div>
 
             {/* Social Contacts */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Social Contacts</h3>
-              <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="font-medium">Social Contacts</h3>
+              <div className="grid md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="socialContact.facebook"
@@ -382,10 +355,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>Facebook *</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://facebook.com/username"
-                          {...field}
-                        />
+                        <Input placeholder="Facebook URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -398,10 +368,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>YouTube</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://youtube.com/username"
-                          {...field}
-                        />
+                        <Input placeholder="YouTube URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -414,10 +381,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>Instagram</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://instagram.com/username"
-                          {...field}
-                        />
+                        <Input placeholder="Instagram URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -430,10 +394,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>LinkedIn</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://linkedin.com/username"
-                          {...field}
-                        />
+                        <Input placeholder="LinkedIn URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -446,7 +407,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>WhatsApp</FormLabel>
                       <FormControl>
-                        <Input placeholder="8801XXXXXXXXX" {...field} />
+                        <Input placeholder="WhatsApp number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -459,10 +420,7 @@ export default function CreateWebsiteInfoForm() {
                     <FormItem>
                       <FormLabel>Twitter</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://twitter.com/username"
-                          {...field}
-                        />
+                        <Input placeholder="Twitter URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -472,11 +430,11 @@ export default function CreateWebsiteInfoForm() {
             </div>
 
             {/* Addresses */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Addresses</h3>
+            <div className="space-y-4">
+              <h3 className="font-medium">Addresses</h3>
               {form.watch("addresses").map((_, index) => (
-                <div key={index} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-6">
+                <div key={index} className="space-y-4 border p-4 rounded-lg">
+                  <div className="grid md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name={`addresses.${index}.name`}
@@ -526,6 +484,7 @@ export default function CreateWebsiteInfoForm() {
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={() => {
                   form.setValue("addresses", [
                     ...form.getValues("addresses"),
@@ -539,32 +498,26 @@ export default function CreateWebsiteInfoForm() {
             </div>
 
             {/* Map Link */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Map Location</h3>
-              <FormField
-                control={form.control}
-                name="mapLink"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Google Maps Embed URL *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://maps.google.com/..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="mapLink"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Map Link *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Google Maps embed URL" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Footer Links */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Footer Links</h3>
+            <div className="space-y-4">
+              <h3 className="font-medium">Footer Links</h3>
               {form.watch("footerLinks").map((_, index) => (
-                <div key={index} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-6">
+                <div key={index} className="space-y-4 border p-4 rounded-lg">
+                  <div className="grid md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name={`footerLinks.${index}.name`}
@@ -609,7 +562,7 @@ export default function CreateWebsiteInfoForm() {
                       }}
                     >
                       <Trash2Icon className="h-4 w-4 mr-2" />
-                      Remove Link
+                      Remove Footer Link
                     </Button>
                   )}
                 </div>
@@ -617,6 +570,7 @@ export default function CreateWebsiteInfoForm() {
               <Button
                 type="button"
                 variant="outline"
+                size="sm"
                 onClick={() => {
                   form.setValue("footerLinks", [
                     ...form.getValues("footerLinks"),
@@ -630,37 +584,27 @@ export default function CreateWebsiteInfoForm() {
             </div>
 
             {/* Marquee Text */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-medium">Marquee Text</h3>
-              <FormField
-                control={form.control}
-                name="marqueeText"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Text *</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Text to display in the marquee"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="marqueeText"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marquee Text *</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Text to display in the marquee"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Submit Button */}
-            <div className="flex justify-end pt-6">
-              <Button type="submit" size="lg" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Website Information"
-                )}
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create Website Info"}
               </Button>
             </div>
           </form>
