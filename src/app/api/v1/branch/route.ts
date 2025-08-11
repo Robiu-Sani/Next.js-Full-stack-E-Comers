@@ -2,31 +2,31 @@
 import { USER_ROLE } from "@/interface/auth.constent";
 import { auth } from "@/lib/auth";
 import connectDb from "@/lib/connectdb";
-import SubCategory from "@/models/sub-category.model";
+import Branch from "@/models/branch.model";
 import { NextRequest, NextResponse } from "next/server";
 
-// Create Category
+// Create branch
 export async function POST(request: NextRequest) {
   try {
-    const category = await request.json();
+    const branch = await request.json();
 
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN);
 
-    const createdCategory = await SubCategory.create(category);
+    const createdbranch = await Branch.create(branch);
 
     return NextResponse.json(
       {
         success: true,
-        data: createdCategory,
-        message: "Category created successfully",
+        data: createdbranch,
+        message: "branch created successfully",
       },
       { status: 201 }
     );
   } catch (err: any) {
-    console.error("POST Category error:", err);
+    console.log("POST branch error:", err);
     return NextResponse.json(
-      { success: false, message: err.message || "Failed to create category" },
+      { success: false, message: err.message || "Failed to create branch" },
       { status: 400 }
     );
   }
@@ -40,19 +40,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search") || "";
     const page = Number(searchParams.get("page") || 1);
-    const limit = Number(searchParams.get("limit") || 50);
+    const limit = Number(searchParams.get("limit") || 10);
 
     const query: any = {};
     if (search) {
-      query.name = { $regex: search, $options: "i" };
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { code: { $regex: search, $options: "i" } },
+        { contactNumber: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
     }
 
-    const total = await SubCategory.countDocuments(query);
-    const categories = await SubCategory.find(query)
-      .populate({
-        path: "category",
-        select: "name -_id",
-      })
+    const total = await Branch.countDocuments(query);
+    const categories = await Branch.find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (err: any) {
-    console.error("GET Category error:", err);
+    console.error("GET branch error:", err);
     return NextResponse.json(
       { success: false, message: err.message || "Failed to fetch categories" },
       { status: 400 }

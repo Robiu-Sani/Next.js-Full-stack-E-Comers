@@ -1,10 +1,10 @@
 import React from "react";
-import ParentBranche from "./ParentBranche";
+import CreateBranch from "./CreateBranch";
 
 export default function page() {
   return (
     <div>
-      <ParentBranche />
+      <CreateBranch />
     </div>
   );
 }

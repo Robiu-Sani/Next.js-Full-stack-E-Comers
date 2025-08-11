@@ -1,10 +1,10 @@
 import React from "react";
-import ParentBranche from "./ParentBranche";
+import EditBranchForm from "./EditBranchForm";
 
 export default function page() {
   return (
     <div>
-      <ParentBranche />
+      <EditBranchForm />
     </div>
   );
 }

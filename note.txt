@@ -20,3 +20,219 @@ next auth value
 https://myaccount.google.com/apppasswords
 // bulk message dosc
 https://bulksmsbd.com/bulksms-api-bangladesh.php
+
+
+
+------- cpu -------------
+Cores
+Threads
+Cache Memory
+ALU (Arithmetic Logic Unit)
+FPU (Floating Point Unit)
+Control Unit (CU)
+Registers
+Instruction Decoder
+Execution Units
+Bus Interface Unit
+Clock Generator
+Branch Predictor
+Pipeline
+Memory Management Unit (MMU)
+Prefetch Unit
+Integrated Graphics Processor (iGPU) (optional)
+Pre Build
+body
+----------- ip phone --------------
+
+Cisco
+
+Avaya
+
+Poly (formerly Polycom & Plantronics)
+
+Yealink
+
+Grandstream
+
+Mitel
+
+Panasonic
+
+Snom
+
+Alcatel-Lucent
+
+Fanvil
+
+NEC
+
+VTech
+
+Aastra
+
+------------ paper shredder ------------------
+
+Fellowes
+
+Aurora
+
+Bonsaii
+
+Swingline
+
+Amazon Basics
+
+Royal
+
+HSM
+
+Dahle
+
+Ideal
+
+GBC (General Binding Corporation)
+
+Intimus
+
+Kobra
+
+Hama
+
+Rexel
+
+Hewlett-Packard (HP Shredders)
+
+Ativa
+
+Wallner
+
+GoECOlife
+
+Qshred
+
+Offistamp
+
+-------- headphones ---------
+
+Sony
+
+Bose
+
+Sennheiser
+
+Audio-Technica
+
+Beyerdynamic
+
+AKG
+
+Shure
+
+Focal
+
+Bang & Olufsen (B&O)
+
+JBL
+
+Apple (AirPods, Beats)
+
+Beats by Dre
+
+Skullcandy
+
+Philips
+
+Panasonic
+
+Marshall
+
+Razer
+
+HyperX
+
+SteelSeries
+
+Logitech G
+
+Plantronics (Poly)
+
+Audeze
+
+HIFIMAN
+
+Grado Labs
+
+Klipsch
+
+Pioneer DJ
+
+Campfire Audio
+
+Edifier
+
+Anker (Soundcore)
+
+1MORE
+
+
+--------- star link ---------
+
+Starlink Standard
+
+Starlink Standard Actuated Kit (with motorized orientation)
+
+Starlink Mini
+
+Starlink High Performance
+
+Starlink Flat High Performance
+
+Starlink Standard Circular
+
+Starlink Enterprise 
+Starlink
+
+
+
+
+-------- wifi -------
+
+Asus
+
+Netgear
+
+TP-Link
+
+Linksys
+
+D-Link
+
+Ubiquiti Networks (UniFi)
+
+Cisco
+
+Huawei
+
+Zyxel
+
+MikroTik
+
+Google Nest WiFi
+
+Amazon eero
+
+Belkin
+
+Arris
+
+Motorola
+
+Tenda
+
+Xiaomi
+
+Edimax
+
+DrayTek
+
+OpenMesh

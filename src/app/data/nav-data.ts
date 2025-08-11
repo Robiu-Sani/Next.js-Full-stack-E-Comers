@@ -72,19 +72,23 @@ export const data = {
       items: [
         {
           title: "Create Product",
-          url: "/dashbaord/create-product",
+          url: "/dashboard/create-product",
         },
         {
           title: "Create Customer",
-          url: "/dashbaord/create-customer",
+          url: "/dashboard/create-customer",
+        },
+        {
+          title: "Create Branch",
+          url: "/dashboard/create-branch",
         },
         {
           title: "Create Member",
-          url: "/dashbaord/create-member",
+          url: "/dashboard/create-member",
         },
         {
           title: "Create Site-info",
-          url: "/dashbaord/create-site-info",
+          url: "/dashboard/create-site-info",
         },
       ],
     },
