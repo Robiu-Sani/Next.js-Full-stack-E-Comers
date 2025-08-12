@@ -1,0 +1,784 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { PlusIcon, Trash2Icon } from "lucide-react";
+import SingleImageUpload from "@/shired-component/SingleImageUpload";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+interface FormValues {
+  number: string;
+  email: string;
+  name: string;
+  logo: string;
+  banner: {
+    carousel: Array<{ image: string; link?: string }>;
+    firstImage: { image: string; link?: string };
+    secondImage: { image: string; link?: string };
+  };
+  socialContact: {
+    facebook: string;
+    youtube?: string;
+    instagrame?: string;
+    linkedIn?: string;
+    whatsApp?: string;
+    twitter?: string;
+  };
+  addresses: Array<{ name: string; address: string }>;
+  mapLink: string;
+  footerLinks: Array<{ name: string; url?: string }>;
+  marqueeText: string;
+}
+
+export default function EditInfo() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const form = useForm<FormValues>({
+    defaultValues: {
+      number: "",
+      email: "",
+      name: "",
+      logo: "",
+      banner: {
+        carousel: [{ image: "", link: "" }],
+        firstImage: { image: "", link: "" },
+        secondImage: { image: "", link: "" },
+      },
+      socialContact: {
+        facebook: "",
+        youtube: "",
+        instagrame: "",
+        linkedIn: "",
+        whatsApp: "",
+        twitter: "",
+      },
+      addresses: [{ name: "", address: "" }],
+      mapLink: "",
+      footerLinks: [{ name: "", url: "" }],
+      marqueeText: "",
+    },
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/v1/web-info", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          throw new Error(result.message || "Failed to fetch website info");
+        }
+
+        // Map fetched data to form values, omitting _id fields
+        const fetchedData = result.data;
+        form.reset({
+          number: fetchedData.number || "",
+          email: fetchedData.email || "",
+          name: fetchedData.name || "",
+          logo: fetchedData.logo || "",
+          banner: {
+            carousel: fetchedData.banner.carousel.map((item: any) => ({
+              image: item.image,
+              link: item.link || "",
+            })),
+            firstImage: {
+              image: fetchedData.banner.firstImage.image,
+              link: fetchedData.banner.firstImage.link || "",
+            },
+            secondImage: {
+              image: fetchedData.banner.secondImage.image,
+              link: fetchedData.banner.secondImage.link || "",
+            },
+          },
+          socialContact: {
+            facebook: fetchedData.socialContact.facebook || "",
+            youtube: fetchedData.socialContact.youtube || "",
+            instagrame: fetchedData.socialContact.instagrame || "",
+            linkedIn: fetchedData.socialContact.linkedIn || "",
+            whatsApp: fetchedData.socialContact.whatsApp || "",
+            twitter: fetchedData.socialContact.twitter || "",
+          },
+          addresses: fetchedData.addresses.map((address: any) => ({
+            name: address.name,
+            address: address.address,
+          })),
+          mapLink: fetchedData.mapLink || "",
+          footerLinks: fetchedData.footerLinks.map((link: any) => ({
+            name: link.name,
+            url: link.url || "",
+          })),
+          marqueeText: fetchedData.marqueeText || "",
+        });
+      } catch (error) {
+        console.error("Fetch error:", error);
+        toast.error("Failed to load website info", {
+          description:
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [form]);
+
+  const validateForm = (data: FormValues) => {
+    const errors: Record<string, string> = {};
+
+    if (!data.name) errors.name = "Website name is required";
+    if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
+      errors.email = "Valid email is required";
+    if (!data.number) errors.number = "Phone number is required";
+    if (!data.logo) errors.logo = "Logo is required";
+    if (!data.banner.firstImage.image)
+      errors["banner.firstImage.image"] = "First banner image is required";
+    if (!data.banner.secondImage.image)
+      errors["banner.secondImage.image"] = "Second banner image is required";
+    if (!data.socialContact.facebook)
+      errors["socialContact.facebook"] = "Facebook link is required";
+    if (!data.mapLink) errors.mapLink = "Map link is required";
+    if (!data.marqueeText) errors.marqueeText = "Marquee text is required";
+
+    data.addresses.forEach((address, index) => {
+      if (!address.name)
+        errors[`addresses.${index}.name`] = "Address name is required";
+      if (!address.address)
+        errors[`addresses.${index}.address`] = "Address is required";
+    });
+
+    data.footerLinks.forEach((link, index) => {
+      if (!link.name)
+        errors[`footerLinks.${index}.name`] = "Link name is required";
+    });
+
+    data.banner.carousel.forEach((carousel, index) => {
+      if (!carousel.image)
+        errors[`banner.carousel.${index}.image`] = `Carousel image ${
+          index + 1
+        } is required`;
+    });
+
+    return errors;
+  };
+
+  const onSubmit = async (values: FormValues) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/v1/web-info", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update website info");
+      }
+
+      toast.success("Website information updated successfully");
+      router.push("/info"); // Redirect to info page after successful update
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to update website info", {
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (data: FormValues) => {
+    const errors = validateForm(data);
+
+    if (Object.keys(errors).length > 0) {
+      Object.entries(errors).forEach(([field, message]) => {
+        form.setError(field as keyof FormValues, { type: "manual", message });
+      });
+      toast.error("Please fill all required fields correctly");
+      return;
+    }
+
+    await onSubmit(data);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <Card className="border-0 shadow-none p-0 w-full mx-auto mt-6">
+      <CardHeader>
+        <CardTitle>Edit Website Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
+            {/* Basic Information */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website Name *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Website Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+880..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Logo */}
+            <FormField
+              control={form.control}
+              name="logo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Logo *</FormLabel>
+                  <div className="flex items-center gap-4">
+                    <FormControl>
+                      <SingleImageUpload
+                        onUpload={(url: string) => field.onChange(url)}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    {field.value && (
+                      <div className="relative w-20 h-20 rounded-md overflow-hidden border">
+                        <Image
+                          src={field.value}
+                          alt="Logo preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Banner Images */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Banner Images</h3>
+
+              {/* First Image */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">First Banner</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="banner.firstImage.image"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image *</FormLabel>
+                        <div className="flex flex-col gap-2">
+                          <FormControl>
+                            <SingleImageUpload
+                              onUpload={(url: string) => field.onChange(url)}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          {field.value && (
+                            <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                              <Image
+                                src={field.value}
+                                alt="First banner preview"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="banner.firstImage.link"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Link</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Link URL" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Second Image */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Second Banner</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="banner.secondImage.image"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Image *</FormLabel>
+                        <div className="flex flex-col gap-2">
+                          <FormControl>
+                            <SingleImageUpload
+                              onUpload={(url: string) => field.onChange(url)}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          {field.value && (
+                            <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                              <Image
+                                src={field.value}
+                                alt="Second banner preview"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="banner.secondImage.link"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Link</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Link URL" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Carousel Images */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Carousel Banners</h4>
+                {form.watch("banner.carousel").map((_, index) => (
+                  <div key={index} className="space-y-4 border p-4 rounded-lg">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name={`banner.carousel.${index}.image`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Image {index + 1} *</FormLabel>
+                            <div className="flex flex-col gap-2">
+                              <FormControl>
+                                <SingleImageUpload
+                                  onUpload={(url: string) =>
+                                    field.onChange(url)
+                                  }
+                                  disabled={isSubmitting}
+                                />
+                              </FormControl>
+                              {field.value && (
+                                <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                                  <Image
+                                    src={field.value}
+                                    alt={`Carousel image ${index + 1} preview`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`banner.carousel.${index}.link`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Link {index + 1}</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Link URL" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {index > 0 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          const carousel = form.getValues("banner.carousel");
+                          form.setValue(
+                            "banner.carousel",
+                            carousel.filter((_, i) => i !== index)
+                          );
+                        }}
+                      >
+                        <Trash2Icon className="h-4 w-4 mr-2" />
+                        Remove Carousel
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    form.setValue("banner.carousel", [
+                      ...form.getValues("banner.carousel"),
+                      { image: "", link: "" },
+                    ]);
+                  }}
+                >
+                  <PlusIcon className="h-4 w-4 mr-2" />
+                  Add Carousel Image
+                </Button>
+              </div>
+            </div>
+
+            {/* Social Contacts */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Social Contacts</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="socialContact.facebook"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Facebook *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Facebook URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="socialContact.youtube"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>YouTube</FormLabel>
+                      <FormControl>
+                        <Input placeholder="YouTube URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="socialContact.instagrame"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instagram</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Instagram URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="socialContact.linkedIn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>LinkedIn</FormLabel>
+                      <FormControl>
+                        <Input placeholder="LinkedIn URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="socialContact.whatsApp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>WhatsApp</FormLabel>
+                      <FormControl>
+                        <Input placeholder="WhatsApp number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="socialContact.twitter"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Twitter</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Twitter URL" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Addresses */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Addresses</h3>
+              {form.watch("addresses").map((_, index) => (
+                <div key={index} className="space-y-4 border p-4 rounded-lg">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name={`addresses.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., Head Office" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`addresses.${index}.address`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address *</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Full address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        const addresses = form.getValues("addresses");
+                        form.setValue(
+                          "addresses",
+                          addresses.filter((_, i) => i !== index)
+                        );
+                      }}
+                    >
+                      <Trash2Icon className="h-4 w-4 mr-2" />
+                      Remove Address
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  form.setValue("addresses", [
+                    ...form.getValues("addresses"),
+                    { name: "", address: "" },
+                  ]);
+                }}
+              >
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Add Address
+              </Button>
+            </div>
+
+            {/* Map Link */}
+            <FormField
+              control={form.control}
+              name="mapLink"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Map Link *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Google Maps embed URL" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Footer Links */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Footer Links</h3>
+              {form.watch("footerLinks").map((_, index) => (
+                <div key={index} className="space-y-4 border p-4 rounded-lg">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name={`footerLinks.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Link Name *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., About Us" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`footerLinks.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Link URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="https://example.com/about"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        const footerLinks = form.getValues("footerLinks");
+                        form.setValue(
+                          "footerLinks",
+                          footerLinks.filter((_, i) => i !== index)
+                        );
+                      }}
+                    >
+                      <Trash2Icon className="h-4 w-4 mr-2" />
+                      Remove Footer Link
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  form.setValue("footerLinks", [
+                    ...form.getValues("footerLinks"),
+                    { name: "", url: "" },
+                  ]);
+                }}
+              >
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Add Footer Link
+              </Button>
+            </div>
+
+            {/* Marquee Text */}
+            <FormField
+              control={form.control}
+              name="marqueeText"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marquee Text *</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Text to display in the marquee"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="cursor-pointer"
+              >
+                {isSubmitting ? "Updating..." : "Update Website Info"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}

@@ -114,7 +114,7 @@ export default function Info() {
 
   const handleEdit = () => {
     // Assuming an edit page exists at this route
-    router.push("/edit-website-info");
+    router.push("/dashboard/website-info/edit");
   };
 
   if (isLoading) {
