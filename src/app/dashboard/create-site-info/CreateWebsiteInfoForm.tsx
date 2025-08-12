@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -19,60 +17,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import SingleImageUpload from "@/shired-component/SingleImageUpload";
+import Image from "next/image";
 
-// Define validation schema
-const formSchema = z.object({
-  number: z.string().min(1, "Phone number is required"),
-  email: z.string().email("Invalid email").min(1, "Email is required"),
-  name: z.string().min(1, "Website name is required"),
-  logo: z.string().min(1, "Logo URL is required"),
-  banner: z.object({
-    carousel: z.array(
-      z.object({
-        image: z.string().min(1, "Image URL is required"),
-        link: z.string().min(1, "Link is required"),
-      })
-    ),
-    firstImage: z.object({
-      image: z.string().min(1, "Image URL is required"),
-      link: z.string().min(1, "Link is required"),
-    }),
-    secondImage: z.object({
-      image: z.string().min(1, "Image URL is required"),
-      link: z.string().min(1, "Link is required"),
-    }),
-  }),
-  socialContact: z.object({
-    facebook: z.string().min(1, "Facebook link is required"),
-    youtube: z.string().optional(),
-    instagrame: z.string().optional(),
-    linkedIn: z.string().optional(),
-    whatsApp: z.string().optional(),
-    twitter: z.string().optional(),
-  }),
-  addresses: z.array(
-    z.object({
-      name: z.string().min(1, "Address name is required"),
-      address: z.string().min(1, "Address is required"),
-    })
-  ),
-  mapLink: z.string().min(1, "Map link is required"),
-  footerLinks: z.array(
-    z.object({
-      name: z.string().min(1, "Link name is required"),
-      url: z.string().min(1, "URL is required"),
-    })
-  ),
-  marqueeText: z.string().min(1, "Marquee text is required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+interface FormValues {
+  number: string;
+  email: string;
+  name: string;
+  logo: string;
+  banner: {
+    carousel: Array<{ image: string; link?: string }>;
+    firstImage: { image: string; link?: string };
+    secondImage: { image: string; link?: string };
+  };
+  socialContact: {
+    facebook: string;
+    youtube?: string;
+    instagrame?: string;
+    linkedIn?: string;
+    whatsApp?: string;
+    twitter?: string;
+  };
+  addresses: Array<{ name: string; address: string }>;
+  mapLink: string;
+  footerLinks: Array<{ name: string; url?: string }>;
+  marqueeText: string;
+}
 
 export default function CreateWebsiteInfoForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       number: "",
       email: "",
@@ -96,6 +70,7 @@ export default function CreateWebsiteInfoForm() {
       footerLinks: [{ name: "", url: "" }],
       marqueeText: "",
     },
+    mode: "onChange",
   });
 
   const onSubmit = async (values: FormValues) => {
@@ -118,6 +93,7 @@ export default function CreateWebsiteInfoForm() {
       toast.success("Website information created successfully");
       form.reset();
     } catch (error) {
+      console.error("Submission error:", error);
       toast.error("Failed to create website info", {
         description:
           error instanceof Error ? error.message : "An unknown error occurred",
@@ -127,6 +103,59 @@ export default function CreateWebsiteInfoForm() {
     }
   };
 
+  const validateForm = (data: FormValues) => {
+    const errors: Record<string, string> = {};
+
+    if (!data.name) errors.name = "Website name is required";
+    if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
+      errors.email = "Valid email is required";
+    if (!data.number) errors.number = "Phone number is required";
+    if (!data.logo) errors.logo = "Logo is required";
+    if (!data.banner.firstImage.image)
+      errors["banner.firstImage.image"] = "First banner image is required";
+    if (!data.banner.secondImage.image)
+      errors["banner.secondImage.image"] = "Second banner image is required";
+    if (!data.socialContact.facebook)
+      errors["socialContact.facebook"] = "Facebook link is required";
+    if (!data.mapLink) errors.mapLink = "Map link is required";
+    if (!data.marqueeText) errors.marqueeText = "Marquee text is required";
+
+    data.addresses.forEach((address, index) => {
+      if (!address.name)
+        errors[`addresses.${index}.name`] = "Address name is required";
+      if (!address.address)
+        errors[`addresses.${index}.address`] = "Address is required";
+    });
+
+    data.footerLinks.forEach((link, index) => {
+      if (!link.name)
+        errors[`footerLinks.${index}.name`] = "Link name is required";
+    });
+
+    data.banner.carousel.forEach((carousel, index) => {
+      if (!carousel.image)
+        errors[`banner.carousel.${index}.image`] = `Carousel image ${
+          index + 1
+        } is required`;
+    });
+
+    return errors;
+  };
+
+  const handleSubmit = async (data: FormValues) => {
+    const errors = validateForm(data);
+
+    if (Object.keys(errors).length > 0) {
+      Object.entries(errors).forEach(([field, message]) => {
+        form.setError(field as keyof FormValues, { type: "manual", message });
+      });
+      toast.error("Please fill all required fields correctly");
+      return;
+    }
+
+    await onSubmit(data);
+  };
+
   return (
     <Card className="border-0 shadow-none p-0 w-full mx-auto mt-6">
       <CardHeader>
@@ -134,7 +163,10 @@ export default function CreateWebsiteInfoForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             {/* Basic Information */}
             <div className="grid md:grid-cols-3 gap-4">
               <FormField
@@ -185,12 +217,24 @@ export default function CreateWebsiteInfoForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Logo *</FormLabel>
-                  <FormControl>
-                    <SingleImageUpload
-                      onUpload={(url: string) => field.onChange(url)}
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
+                  <div className="flex items-center gap-4">
+                    <FormControl>
+                      <SingleImageUpload
+                        onUpload={(url: string) => field.onChange(url)}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    {field.value && (
+                      <div className="relative w-20 h-20 rounded-md overflow-hidden border">
+                        <Image
+                          src={field.value}
+                          alt="Logo preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -210,12 +254,24 @@ export default function CreateWebsiteInfoForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Image *</FormLabel>
-                        <FormControl>
-                          <SingleImageUpload
-                            onUpload={(url: string) => field.onChange(url)}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
+                        <div className="flex flex-col gap-2">
+                          <FormControl>
+                            <SingleImageUpload
+                              onUpload={(url: string) => field.onChange(url)}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          {field.value && (
+                            <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                              <Image
+                                src={field.value}
+                                alt="First banner preview"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -225,7 +281,7 @@ export default function CreateWebsiteInfoForm() {
                     name="banner.firstImage.link"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Link *</FormLabel>
+                        <FormLabel>Link</FormLabel>
                         <FormControl>
                           <Input placeholder="Link URL" {...field} />
                         </FormControl>
@@ -246,12 +302,24 @@ export default function CreateWebsiteInfoForm() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Image *</FormLabel>
-                        <FormControl>
-                          <SingleImageUpload
-                            onUpload={(url: string) => field.onChange(url)}
-                            disabled={isSubmitting}
-                          />
-                        </FormControl>
+                        <div className="flex flex-col gap-2">
+                          <FormControl>
+                            <SingleImageUpload
+                              onUpload={(url: string) => field.onChange(url)}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          {field.value && (
+                            <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                              <Image
+                                src={field.value}
+                                alt="Second banner preview"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -261,7 +329,7 @@ export default function CreateWebsiteInfoForm() {
                     name="banner.secondImage.link"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Link *</FormLabel>
+                        <FormLabel>Link</FormLabel>
                         <FormControl>
                           <Input placeholder="Link URL" {...field} />
                         </FormControl>
@@ -284,12 +352,26 @@ export default function CreateWebsiteInfoForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Image {index + 1} *</FormLabel>
-                            <FormControl>
-                              <SingleImageUpload
-                                onUpload={(url: string) => field.onChange(url)}
-                                disabled={isSubmitting}
-                              />
-                            </FormControl>
+                            <div className="flex flex-col gap-2">
+                              <FormControl>
+                                <SingleImageUpload
+                                  onUpload={(url: string) =>
+                                    field.onChange(url)
+                                  }
+                                  disabled={isSubmitting}
+                                />
+                              </FormControl>
+                              {field.value && (
+                                <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                                  <Image
+                                    src={field.value}
+                                    alt={`Carousel image ${index + 1} preview`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -299,7 +381,7 @@ export default function CreateWebsiteInfoForm() {
                         name={`banner.carousel.${index}.link`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Link {index + 1} *</FormLabel>
+                            <FormLabel>Link {index + 1}</FormLabel>
                             <FormControl>
                               <Input placeholder="Link URL" {...field} />
                             </FormControl>
@@ -536,7 +618,7 @@ export default function CreateWebsiteInfoForm() {
                       name={`footerLinks.${index}.url`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Link URL *</FormLabel>
+                          <FormLabel>Link URL</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="https://example.com/about"
@@ -603,7 +685,11 @@ export default function CreateWebsiteInfoForm() {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="cursor-pointer"
+              >
                 {isSubmitting ? "Creating..." : "Create Website Info"}
               </Button>
             </div>
