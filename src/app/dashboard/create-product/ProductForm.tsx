@@ -137,7 +137,7 @@ const ProductForm = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <Card>
+      <Card className="p-0 border-0 shadow-none py-6">
         <CardHeader>
           <CardTitle>Add New Product</CardTitle>
         </CardHeader>
