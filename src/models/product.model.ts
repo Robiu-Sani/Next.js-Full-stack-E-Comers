@@ -8,9 +8,9 @@ const ProductSchema: Schema = new Schema<IProduct>(
 
     priceVariants: [
       {
-        regularPrice: { type: Number, required: true },
+        regularPrice: { type: Number },
         salePrice: { type: Number },
-        quantity: { type: Number, required: true },
+        quentity: { type: Number },
         sku: { type: String },
       },
     ],
