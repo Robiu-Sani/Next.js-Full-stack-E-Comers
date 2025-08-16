@@ -2,7 +2,7 @@
 import { USER_ROLE } from "@/interface/auth.constent";
 import { auth } from "@/lib/auth";
 import connectDb from "@/lib/connectdb";
-import CustomerModel from "@/models/customer.model";
+import Management from "@/models/menagement.model";
 import UserModel from "@/models/user.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
             number: data.number,
             username: data?.username || "",
             password: data.password,
-            role: "user",
+            role: data.role,
             isActive: true,
           },
         ],
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
 
       // 2️⃣ Create the Customer linked to the user
-      createdCustomer = await CustomerModel.create(
+      createdCustomer = await Management.create(
         [
           {
             ...data,
@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
       query.name = { $regex: search, $options: "i" };
     }
 
-    const total = await CustomerModel.countDocuments(query);
-    const customers = await CustomerModel.find(query)
+    const total = await Management.countDocuments(query);
+    const customers = await Management.find(query)
       .populate("user", "email number username role")
       .skip((page - 1) * limit)
       .limit(limit)
@@ -120,13 +120,9 @@ export async function PATCH(request: NextRequest) {
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN);
 
-    const updatedCustomer = await CustomerModel.findByIdAndUpdate(
-      id,
-      updateData,
-      {
-        new: true,
-      }
-    );
+    const updatedCustomer = await Management.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!updatedCustomer) {
       throw new Error("Customer not found");
@@ -158,7 +154,7 @@ export async function DELETE(request: NextRequest) {
     await connectDb();
     await auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN);
 
-    const customer = await CustomerModel.findById(id);
+    const customer = await Management.findById(id);
     if (!customer) {
       throw new Error("Customer not found");
     }
