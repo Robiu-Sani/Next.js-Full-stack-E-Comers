@@ -30,6 +30,7 @@ interface ProductFormData {
   coupon: any[];
   tags: string[];
   brand?: string;
+  quentity: number;
   isFeatured: boolean;
   isDeleted: boolean;
   hasOffer: boolean;

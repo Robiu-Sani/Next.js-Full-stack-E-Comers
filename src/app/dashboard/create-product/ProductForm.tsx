@@ -45,6 +45,7 @@ interface ProductFormData {
   coupon: Coupon[];
   tags: string[];
   brand?: string;
+  quentity: number;
   isFeatured: boolean;
   isDeleted: boolean;
   hasOffer: boolean;
@@ -69,6 +70,7 @@ const ProductForm = () => {
       coupon: [],
       tags: [],
       brand: "",
+      quentity: 0,
       isFeatured: false,
       isDeleted: false,
       hasOffer: false,

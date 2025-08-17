@@ -93,21 +93,21 @@ export const data = {
       ],
     },
     {
-      title: "Models",
+      title: "Handle Users",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "All Users",
+          url: "/dashboard/handle-users",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "All Customer",
+          url: "/dashboard/handle-customers",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Team members",
+          url: "/dashboard/handle-teammembers",
         },
       ],
     },

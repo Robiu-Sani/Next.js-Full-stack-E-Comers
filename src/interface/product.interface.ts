@@ -10,7 +10,7 @@ export interface IProduct {
     quantity: number;
     sku?: string;
   }[];
-
+  quentity: number;
   quickOverview: string[];
 
   specifications: {

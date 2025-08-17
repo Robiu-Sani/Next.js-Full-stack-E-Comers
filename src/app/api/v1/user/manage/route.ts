@@ -159,12 +159,10 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const search = searchParams.get("search") || "";
 
-    const limit = 40;
+    const limit = 50;
     const skip = (page - 1) * limit;
 
-    const query: any = {
-      isDeleted: false,
-    };
+    const query: any = {};
 
     if (search) {
       query.$or = [

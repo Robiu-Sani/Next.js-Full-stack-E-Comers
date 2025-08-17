@@ -33,6 +33,7 @@ const ProductSchema: Schema = new Schema<IProduct>(
       },
     ],
 
+    quentity: { type: Number },
     reviews: [
       {
         type: Schema.Types.ObjectId,
