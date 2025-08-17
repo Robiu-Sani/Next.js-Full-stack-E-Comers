@@ -127,7 +127,7 @@ export default function Info() {
 
   if (!data) {
     return (
-      <Card className="w-full border-0 shadow-none p-0 mt-6">
+      <Card className="w-full border-0 shadow-none p-0 py-4 mt-6">
         <CardContent className="pt-6">
           <p className="text-center text-muted-foreground">
             No website information available
