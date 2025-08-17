@@ -48,6 +48,7 @@ interface ProductFormData {
   coupon: Coupon[];
   tags: string[];
   brand?: string;
+  quentity: number;
   isFeatured: boolean;
   isDeleted: boolean;
   hasOffer: boolean;
@@ -215,6 +216,19 @@ const ProductPricingAndOffers = ({ form }: ProductPricingAndOffersProps) => {
         </div>
 
         {/* General Price */}
+        <div>
+          <Label htmlFor="quentity">Quentity</Label>
+          <Input
+            type="number"
+            id="quentity"
+            {...register("quentity", {
+              required: "quentity is required",
+              valueAsNumber: true,
+              min: { value: 0, message: "quentity must be positive" },
+            })}
+          />
+        </div>
+
         <div>
           <Label>General Pricing</Label>
           <div className="grid grid-cols-3 gap-4 mt-2">
