@@ -53,7 +53,7 @@ const ProductSchema: Schema = new Schema<IProduct>(
     subCategory: {
       type: Schema.Types.ObjectId,
       ref: "SubCategory",
-      required: true,
+      required: false,
     },
 
     coupon: [
