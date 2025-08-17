@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -16,6 +17,7 @@ interface Category {
 interface SubCategory {
   _id: string;
   name: string;
+  category: Category;
 }
 
 interface ProductFormData {
@@ -54,58 +56,22 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
     formState: { errors },
   } = form;
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-  const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isSubCategoryDropdownOpen, setIsSubCategoryDropdownOpen] =
     useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [isLoadingSubCategories, setIsLoadingSubCategories] = useState(false);
 
-  const watchedCategory = watch("category");
   const watchedSubCategory = watch("subCategory");
 
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setIsLoadingCategories(true);
-      try {
-        const res = await fetch(
-          `/api/v1/product/category?search=${categorySearch}&page=1&limit=20`,
-          {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store",
-          }
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          setCategories(data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setIsLoadingCategories(false);
-      }
-    };
-
-    fetchCategories();
-  }, [categorySearch]);
-
-  // Fetch subcategories when category changes
+  // Fetch all subcategories with their categories
   useEffect(() => {
     const fetchSubCategories = async () => {
-      if (!selectedCategory) return;
-
       setIsLoadingSubCategories(true);
       try {
         const res = await fetch(
-          `/api/v1/sub-category?category=${selectedCategory}&search=${subCategorySearch}&page=1&limit=20`,
+          `/api/v1/sub-category?search=${subCategorySearch}&page=1&limit=20`,
           {
             method: "GET",
             credentials: "include",
@@ -125,105 +91,35 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
     };
 
     fetchSubCategories();
-  }, [selectedCategory, subCategorySearch]);
+  }, [subCategorySearch]);
 
-  // Set initial values from form
+  // Set initial value from form
   useEffect(() => {
-    if (watchedCategory) {
-      setSelectedCategory(watchedCategory);
-    }
-    if (watchedSubCategory) {
+    if (watchedSubCategory && !selectedSubCategory) {
       setSelectedSubCategory(watchedSubCategory);
     }
-  }, [watchedCategory, watchedSubCategory]);
+  }, [watchedSubCategory]);
 
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setValue("category", categoryId);
-    setValue("subCategory", ""); // Reset subcategory when category changes
-    setSelectedSubCategory("");
-    setIsCategoryDropdownOpen(false);
-  };
-
-  const handleSubCategorySelect = (subCategoryId: string) => {
-    setSelectedSubCategory(subCategoryId);
-    setValue("subCategory", subCategoryId);
+  const handleSubCategorySelect = (subCategory: SubCategory) => {
+    setSelectedSubCategory(subCategory._id);
+    setValue("subCategory", subCategory._id);
+    setValue("category", subCategory.category._id); // Set category from subcategory
     setIsSubCategoryDropdownOpen(false);
-  };
-
-  const getSelectedCategoryName = () => {
-    const category = categories.find((c) => c._id === selectedCategory);
-    return category ? category.name : "Select a category";
   };
 
   const getSelectedSubCategoryName = () => {
     const subCategory = subCategories.find(
       (sc) => sc._id === selectedSubCategory
     );
-    return subCategory ? subCategory.name : "Select a subcategory";
+    return subCategory
+      ? `${subCategory.category.name} - ${subCategory.name}`
+      : "Select a subcategory";
   };
 
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Category Selection */}
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <div className="relative">
-              <div
-                className="flex items-center justify-between w-full p-2 border rounded-md cursor-pointer"
-                onClick={() =>
-                  setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
-                }
-              >
-                <span>{getSelectedCategoryName()}</span>
-                <ChevronDown className="h-4 w-4" />
-              </div>
-
-              {isCategoryDropdownOpen && (
-                <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
-                  <div className="p-2 border-b">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Search categories..."
-                        value={categorySearch}
-                        onChange={(e) => setCategorySearch(e.target.value)}
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="max-h-60 overflow-y-auto">
-                    {isLoadingCategories ? (
-                      <div className="p-4 text-center">
-                        Loading categories...
-                      </div>
-                    ) : categories.length > 0 ? (
-                      categories.map((category) => (
-                        <div
-                          key={category._id}
-                          className="p-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleCategorySelect(category._id)}
-                        >
-                          {category.name}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center">No categories found</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-            {errors.category && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.category.message}
-              </p>
-            )}
-          </div>
-
+        <div className="grid grid-cols-1 gap-6">
           {/* Subcategory Selection */}
           <div>
             <Label htmlFor="subCategory">Subcategory</Label>
@@ -262,18 +158,21 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
                         <div
                           key={subCategory._id}
                           className="p-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() =>
-                            handleSubCategorySelect(subCategory._id)
-                          }
+                          onClick={() => handleSubCategorySelect(subCategory)}
                         >
-                          {subCategory.name}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">
+                              {subCategory.category.name}
+                            </span>
+                            <span className="font-medium">
+                              {subCategory.name}
+                            </span>
+                          </div>
                         </div>
                       ))
                     ) : (
                       <div className="p-4 text-center">
-                        {selectedCategory
-                          ? "No subcategories found for this category"
-                          : "Select a category first"}
+                        No subcategories found
                       </div>
                     )}
                   </div>
@@ -283,6 +182,11 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
             {errors.subCategory && (
               <p className="text-sm text-red-500 mt-1">
                 {errors.subCategory.message}
+              </p>
+            )}
+            {errors.category && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.category.message}
               </p>
             )}
           </div>

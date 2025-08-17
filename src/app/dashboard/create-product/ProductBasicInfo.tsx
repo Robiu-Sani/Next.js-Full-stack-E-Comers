@@ -222,12 +222,13 @@ const ProductBasicInfo = ({ form }: ProductBasicInfoProps) => {
             {watchedTags.map((tag, index) => (
               <Badge
                 key={index}
+                onClick={() => handleRemoveTag(tag)}
                 variant="secondary"
                 className="flex items-center gap-1"
               >
                 {tag}
                 <X
-                  className="h-3 w-3 cursor-pointer"
+                  className="h-4 w-4  cursor-pointer"
                   onClick={() => handleRemoveTag(tag)}
                 />
               </Badge>
