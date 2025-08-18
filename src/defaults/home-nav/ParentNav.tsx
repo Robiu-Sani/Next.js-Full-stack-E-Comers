@@ -1,52 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import NavTopSection from "./NavTopSection";
 import BigScreenNav from "./BigScreenNav";
 import SmallScreenNav from "./SmallScreenNav";
-
-interface NavItem {
-  name: string;
-  id: string;
-  children: {
-    name: string;
-    id: string;
-  }[];
-}
+import useContextData from "../custom-component/useContextData";
 
 export default function ParentNav() {
-  const [navItems, setNavItems] = useState<NavItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchNavData = async () => {
-      try {
-        const res = await fetch("/api/v1/nav", {
-          method: "GET",
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-        if (data.status === "success") {
-          setNavItems(data.navItems);
-        } else {
-          throw new Error(data.message || "Failed to fetch navigation data");
-        }
-      } catch (err) {
-        console.error("Failed to fetch navigation data:", err);
-        setError(
-          err instanceof Error ? err.message : "An unknown error occurred"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNavData();
-  }, []);
+  const { navItems, loading, error } = useContextData();
 
   if (loading) {
     return (

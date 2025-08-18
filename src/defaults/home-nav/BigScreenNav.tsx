@@ -47,7 +47,7 @@ export default function BigScreenNav({ navItems }: { navItems: NavItem[] }) {
               <Button
                 variant="ghost"
                 asChild
-                className="flex items-center gap-1 px-1 py-1"
+                className="flex items-center gap-1 pl-[0px] px-1 py-1"
               >
                 <Link href={`/products/${item.id}`}>
                   {item.name}
@@ -78,7 +78,7 @@ export default function BigScreenNav({ navItems }: { navItems: NavItem[] }) {
                     style={{
                       gridTemplateColumns: `repeat(${getColumns(
                         item.children.length
-                      )}, minmax(150px, 1fr))`,
+                      )}, minmax(100px, 1fr))`,
                     }}
                   >
                     {item.children.map((child) => (
@@ -86,7 +86,7 @@ export default function BigScreenNav({ navItems }: { navItems: NavItem[] }) {
                         key={child.id}
                         variant="ghost"
                         asChild
-                        className="w-full justify-start text-left whitespace-nowrap"
+                        className="w-full justify-start  text-left whitespace-nowrap"
                       >
                         <Link
                           href={`/products/${item.id}/${child.id}`}

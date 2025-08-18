@@ -46,10 +46,10 @@ export default function HomeBanner() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-4">
-          <Skeleton className="w-full md:w-2/3 h-[500px]" />
+          <Skeleton className="w-full md:w-2/3 h-[400px]" />
           <div className="w-full md:w-1/3 flex flex-col gap-4">
-            <Skeleton className="h-[242px] w-full" />
-            <Skeleton className="h-[242px] w-full" />
+            <Skeleton className="h-[192px] w-full" />
+            <Skeleton className="h-[192px] w-full" />
           </div>
         </div>
       </div>
