@@ -4,7 +4,7 @@ import React from "react";
 
 export default function SignupPage() {
   return (
-    <div className="grid min-h-svh container mx-auto rounded-xl overflow-hidden border-0 sm:border lg:grid-cols-2">
+    <div className="grid min-h-svh container mx-auto rounded-xl mt-5 overflow-hidden border-0 sm:border lg:grid-cols-2">
       <div className="bg-gray-100  hidden  lg:block !z-10">
         {/* <img
           src="/placeholder.svg"
