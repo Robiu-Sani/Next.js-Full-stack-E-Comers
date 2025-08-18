@@ -68,12 +68,12 @@ export default function HomeBanner() {
 
   return (
     <div className="container mx-auto px-2 py-4 max-w-7xl">
-      <div className="flex flex-col md:flex-row gap-2">
+      <div className="flex flex-col md:h-[400px] md:flex-row gap-2">
         {/* Carousel Section - 2/3 width on desktop */}
         <div className="w-full md:w-2/3 relative group">
           {bannerData.carousel.length > 0 ? (
             <>
-              <Card className="overflow-hidden md:h-[500px] h-auto min-h-[200px] sm:h-[320px] relative">
+              <Card className="overflow-hidden md:h-[400px] h-auto min-h-[200px] sm:h-[320px] relative">
                 <a href={bannerData.carousel[currentSlide]?.link || "#"}>
                   <Image
                     src={bannerData.carousel[currentSlide]?.image}
