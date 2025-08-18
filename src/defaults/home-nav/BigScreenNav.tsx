@@ -61,7 +61,7 @@ export default function BigScreenNav({ navItems }: { navItems: NavItem[] }) {
               {item.children.length > 0 && (
                 <div
                   className={cn(
-                    "absolute top-full z-50 mt-1 max-h-[350px] overflow-y-auto rounded-md border bg-popover p-1 shadow-lg transition-opacity",
+                    "absolute top-[30px] z-50 mt-1 max-h-[350px] overflow-y-auto rounded-md border bg-popover p-1 shadow-lg transition-opacity",
                     hoveredItem === item.id
                       ? "opacity-100"
                       : "opacity-0 pointer-events-none",
