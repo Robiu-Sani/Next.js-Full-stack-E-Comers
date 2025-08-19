@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,8 +54,6 @@ interface IProfileForm {
 
 const CompleteProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const router = useRouter();
 
   // Initialize form
@@ -95,32 +92,6 @@ const CompleteProfile = () => {
     name: "address",
   });
 
-  // Fetch user data on component mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/v1/user", {
-          credentials: "include",
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-
-          // Pre-fill form with user data
-          form.setValue("email", userData.email);
-          form.setValue("name", userData.name || "");
-          form.setValue("username", userData.username || "");
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      } finally {
-        setIsInitialLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [form]);
-
   // Handle form submission
   const onSubmit = async (data: IProfileForm) => {
     setIsLoading(true);
@@ -128,7 +99,6 @@ const CompleteProfile = () => {
       const formData = {
         ...data,
         dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString() : null,
-        user: user?._id, // Include user ID from backend
       };
 
       const res = await fetch("/api/v1/profile", {
@@ -155,17 +125,6 @@ const CompleteProfile = () => {
       setIsLoading(false);
     }
   };
-
-  if (isInitialLoading) {
-    return (
-      <div className="container mx-auto py-8 max-w-4xl flex justify-center items-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg">Loading your profile...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-8 max-w-4xl">
