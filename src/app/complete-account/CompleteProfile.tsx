@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/popover";
 import SingleImageUpload from "@/shired-component/SingleImageUpload";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IContact {
   contactName: string;
@@ -168,6 +169,11 @@ const CompleteProfile = () => {
 
   return (
     <div className="container mx-auto py-8 max-w-4xl">
+      <div className="flex justify-start items-center p-2">
+        <Link href={`/`}>
+          <Button className="cursor-pointer">Go Home</Button>
+        </Link>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
