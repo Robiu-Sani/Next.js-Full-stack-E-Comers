@@ -51,7 +51,7 @@ export default function OtpForm() {
         description: "You have been verified successfully",
       });
 
-      router.push("/");
+      router.push("/complete-account");
     } catch (err: any) {
       toast("Error", {
         description: err.message || "OTP verification failed",
