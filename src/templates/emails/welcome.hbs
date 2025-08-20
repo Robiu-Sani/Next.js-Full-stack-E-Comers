@@ -1,0 +1,108 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Online Store</title>
+    <style>
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6; color: #333; margin: 0; padding: 0; background-color:
+      #f9f9f9; } .container { max-width: 600px; margin: 0 auto;
+      background-color: #ffffff; } .header { background: linear-gradient(135deg,
+      #1e3c72 0%, #2a5298 100%); padding: 40px 20px; text-align: center; color:
+      white; } .logo { font-size: 32px; font-weight: bold; margin-bottom: 10px;
+      } .welcome-text { font-size: 24px; margin-top: 10px; } .content { padding:
+      40px 30px; } .features { margin: 30px 0; } .feature-item { display: flex;
+      align-items: flex-start; margin-bottom: 20px; } .feature-icon {
+      background-color: #2a5298; color: white; width: 40px; height: 40px;
+      border-radius: 50%; display: flex; align-items: center; justify-content:
+      center; margin-right: 15px; flex-shrink: 0; } .feature-text { flex: 1; }
+      .button { display: inline-block; padding: 15px 35px; background:
+      linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white;
+      text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px
+      0; } .footer { background-color: #f8f9fa; padding: 25px; text-align:
+      center; font-size: 12px; color: #6c757d; border-top: 1px solid #e9ecef; }
+      .support-link { color: #2a5298; text-decoration: none; } @media
+      (max-width: 600px) { .content { padding: 25px 20px; } .header { padding:
+      30px 15px; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">Online Store</div>
+        <div class="welcome-text">Welcome Aboard!</div>
+      </div>
+
+      <div class="content">
+        <h2>Dear {{userName}},</h2>
+        <p>Welcome to Online Store! We're thrilled to have you as part of our
+          Online Store community.</p>
+
+        <p>Your account has been successfully created and verified. You now have
+          access to all our features and resources designed to support Online
+          Store.</p>
+
+        <div class="features">
+          <h3>What you can do:</h3>
+
+          <div class="feature-item">
+            <div class="feature-icon">📚</div>
+            <div class="feature-text">
+              <strong>Access Online Store Resources</strong>
+              <p>Explore our comprehensive library of teaching materials and
+                curriculum guides.</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">👥</div>
+            <div class="feature-text">
+              <strong>Connect with Educators</strong>
+              <p>Join our community of dedicated teachers and administrators.</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">
+              <strong>Manage Your Institution</strong>
+              <p>Use our tools to efficiently manage your Online Store
+                operations.</p>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">🔔</div>
+            <div class="feature-text">
+              <strong>Stay Updated</strong>
+              <p>Receive important announcements and updates about Online Store.</p>
+            </div>
+          </div>
+        </div>
+
+        <p style="text-align: center;">
+          <a href="{{loginUrl}}" class="button">Get Started</a>
+        </p>
+
+        <p>If you have any questions or need assistance, don't hesitate to reach
+          out to our support team. We're here to help you make the most of our
+          platform.</p>
+
+        <p>Once again, welcome to our community!</p>
+
+        <p>Best regards,<br />The Online Store Team</p>
+      </div>
+
+      <div class="footer">
+        <p>© 2024 Online Store. All rights reserved.</p>
+        <p>This is an automated message, please do not reply to this email.</p>
+        <p>Need help? Contact us at
+          <a
+            href="mailto:{{supportEmail}}"
+            class="support-link"
+          >{{supportEmail}}</a></p>
+        <p>Empowering Online Store Through Technology</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - Online Store</title>
+    <style>
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6; color: #333; margin: 0; padding: 0; background-color:
+      #f9f9f9; } .container { max-width: 600px; margin: 0 auto;
+      background-color: #ffffff; } .header { background: linear-gradient(135deg,
+      #1e3c72 0%, #2a5298 100%); padding: 30px 20px; text-align: center; color:
+      white; } .logo { font-size: 28px; font-weight: bold; margin-bottom: 10px;
+      } .content { padding: 30px; } .otp-container { background-color: #f8f9fa;
+      border-radius: 10px; padding: 25px; text-align: center; margin: 25px 0;
+      border: 2px dashed #e9ecef; } .otp-code { font-size: 42px; font-weight:
+      bold; color: #1e3c72; letter-spacing: 8px; margin: 15px 0; font-family:
+      'Courier New', monospace; } .expiry-note { color: #6c757d; font-size:
+      14px; margin-top: 10px; } .button { display: inline-block; padding: 12px
+      30px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+      .footer { background-color: #f8f9fa; padding: 20px; text-align: center;
+      font-size: 12px; color: #6c757d; border-top: 1px solid #e9ecef; }
+      .support-link { color: #2a5298; text-decoration: none; } @media
+      (max-width: 600px) { .content { padding: 20px; } .otp-code { font-size:
+      32px; letter-spacing: 6px; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo">Online Store</div>
+        <div>Email Verification</div>
+      </div>
+
+      <div class="content">
+        <h2>Hello {{userName}},</h2>
+        <p>Thank you for registering with Online Store. To complete your
+          registration, please use the following verification code:</p>
+
+        <div class="otp-container">
+          <div>Your Verification Code</div>
+          <div class="otp-code">{{otp}}</div>
+          <div class="expiry-note">This code will expire in {{expiryTime}}</div>
+        </div>
+
+        <p>Enter this code in the verification page to activate your account. If
+          you didn't request this code, please ignore this email or contact our
+          support team immediately.</p>
+
+        <p style="text-align: center;">
+          <a href="{{loginUrl}}" class="button">Verify Account</a>
+        </p>
+
+        <p><strong>Note:</strong>
+          For security reasons, please do not share this code with anyone.</p>
+      </div>
+
+      <div class="footer">
+        <p>© 2024 Online Store. All rights reserved.</p>
+        <p>This is an automated message, please do not reply to this email.</p>
+        <p>Need assistance? Contact us at
+          <a
+            href="mailto:{{supportEmail}}"
+            class="support-link"
+          >{{supportEmail}}</a></p>
+        <p>Online Store | Building Better Online Communities</p>
+      </div>
+    </div>
+  </body>
+</html>

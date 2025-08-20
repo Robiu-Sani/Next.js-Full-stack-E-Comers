@@ -3,7 +3,7 @@ import connectDb from "@/lib/connectdb";
 import UserModel from "@/models/user.model";
 import OtpModel from "@/models/otp.model";
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "@/lib/send-email";
+import { EmailTemplates } from "@/lib/send-email";
 import { sendSMS } from "@/lib/send-sms";
 import jwt from "jsonwebtoken";
 
@@ -105,17 +105,11 @@ export async function POST(request: NextRequest) {
       });
 
       if (email) {
-        await sendEmail({
-          to: email,
-          subject: "Verify Your Account",
-          text: `
-            <div>
-              <h2>Verify Your Account</h2>
-              <p>Your verification code is: <strong>${otp}</strong></p>
-              <p>This code will expire in 15 minutes.</p>
-            </div>
-          `,
-        });
+        await EmailTemplates.sendOtpEmail(
+          email,
+          otp,
+          email || email.split("@")[0]
+        );
       } else if (number) {
         await sendSMS({
           to: number,
