@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProfileImagePart from "./childrens-component/ProfileImagePart";
 import ProfileInfoPart from "./childrens-component/ProfileInfoPart";
 import OverViewPart from "./childrens-component/OverViewPart";
@@ -79,6 +79,7 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Fetch profile data
   const fetchProfileData = async () => {
@@ -90,7 +91,10 @@ export default function UserProfile() {
         credentials: "include",
         cache: "no-store",
       });
-
+      console.log(res);
+      if (res.statusText == "Not Found") {
+        router.push("/complete-account");
+      }
       if (!res.ok) {
         throw new Error(`Failed to fetch profile: ${res.status}`);
       }
@@ -100,7 +104,7 @@ export default function UserProfile() {
       if (data.success && data.data) {
         setProfileData(data.data);
       } else {
-        throw new Error("Invalid response format");
+        router.push("/complete-account");
       }
     } catch (err) {
       console.error("Error fetching profile:", err);

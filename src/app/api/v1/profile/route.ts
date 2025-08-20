@@ -4,6 +4,7 @@ import { USER_ROLE } from "@/interface/auth.constent";
 import { auth } from "@/lib/auth";
 import connectDb from "@/lib/connectdb";
 import CustomerModel from "@/models/customer.model";
+import UserModel from "@/models/user.model";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
     await connectDb();
 
     // Authenticate the user
-    const { user } = await auth(
+    const { decoded } = await auth(
       USER_ROLE.ADMIN,
       USER_ROLE.MENAGER,
       USER_ROLE.SUPER_ADMIN,
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Check if customer profile already exists for this user
-    const existingCustomer = await CustomerModel.findOne({ user: user._id });
+    const existingCustomer = await UserModel.findOne({ user: decoded.id });
 
     if (existingCustomer) {
       return NextResponse.json(
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Create new customer profile
     const customerData = {
       ...body,
-      user: user._id,
+      user: decoded.id,
     };
 
     const result = await CustomerModel.create(customerData);
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
     await connectDb();
 
     // Authenticate the user
-    const { user } = await auth(
+    const { decoded } = await auth(
       USER_ROLE.ADMIN,
       USER_ROLE.MENAGER,
       USER_ROLE.SUPER_ADMIN,
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Find customer profile for this user
-    const customer = await CustomerModel.findOne({ user: user._id })
+    const customer = await CustomerModel.findOne({ user: decoded.id })
       .populate("user")
       .lean();
 

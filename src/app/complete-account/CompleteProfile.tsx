@@ -126,7 +126,7 @@ const CompleteProfile = () => {
           <Button className="cursor-pointer">Go Home</Button>
         </Link>
       </div>
-      <Card>
+      <Card className="border-0 shadow-none">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
