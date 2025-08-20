@@ -51,13 +51,6 @@ const userSchema: Schema<Iuser> = new Schema<Iuser>(
       type: Boolean,
       default: false,
     },
-
-    // TTL index: MongoDB will delete the document automatically after this time
-    activationExpiresAt: {
-      type: Date,
-      default: () => new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from creation
-      index: { expireAfterSeconds: 0 }, // delete exactly at activationExpiresAt
-    },
   },
   {
     timestamps: true,

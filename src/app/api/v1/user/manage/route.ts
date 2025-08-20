@@ -14,20 +14,60 @@ export async function POST(request: NextRequest) {
   try {
     const signUpData = await request.json();
     const { email, number, isSocial } = signUpData;
-
     await connectDb();
 
+    // Determine the identifier (email or number)
+    const identifier = email || number;
+    if (!identifier) {
+      return NextResponse.json(
+        { success: false, error: "Email or number is required" },
+        { status: 400 }
+      );
+    }
+
+    let existingUser;
+
+    if (email) {
+      existingUser = await UserModel.findOne({ email: email });
+    } else {
+      existingUser = await UserModel.findOne({ number: number });
+    }
+
+    if (existingUser) {
+      if (existingUser.isActive) {
+        // User exists and is active - no need to create new account
+        return NextResponse.json(
+          {
+            success: false,
+            error: "User already exists and is active",
+            user: existingUser,
+          },
+          { status: 409 }
+        );
+      } else {
+        // User exists but is inactive - delete and create new account
+        await UserModel.findByIdAndDelete(existingUser._id);
+
+        // Also delete any pending OTPs for this identifier
+        await OtpModel.deleteMany({ identifier });
+      }
+    }
+
+    // Prepare user data
     if (isSocial) {
       signUpData.password = "password";
       signUpData.isSocial = true;
       signUpData.isActive = true;
+    } else {
+      signUpData.isActive = false;
     }
 
+    // Create new user
     const newUser = new UserModel(signUpData);
     const savedUser = await newUser.save();
 
     if (!isSocial) {
-      const identifier = email || number;
+      // Generate and send OTP for non-social signups
       const otp = generateOTP();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -49,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "User created",
+      message: "User created successfully",
       user: savedUser,
     });
   } catch (err) {
@@ -100,7 +140,12 @@ export async function PATCH(request: NextRequest) {
 
     // Create JWT tokens
     const accessToken = jwt.sign(
-      { userId: user._id, role: user.role },
+      {
+        userId: user._id,
+        role: user.role,
+        email: user.email,
+        number: user.number,
+      },
       process.env.NEXT_PUBLIC_JWT_ACCESS_SECRET!,
       {
         expiresIn: process.env.NEXT_PUBLIC_EXPIRE_ACCESS_TOKEN_IN || "5h",

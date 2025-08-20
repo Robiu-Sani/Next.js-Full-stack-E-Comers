@@ -6,7 +6,7 @@ export interface Iuser {
   role: "user" | "admin" | "super-admin" | "menager";
   status: "in-progress" | "blocked";
   isSocial: boolean;
-  activationExpiresAt: Date;
+  // activationExpiresAt: Date;
   isActive: boolean;
   isDeleted: boolean;
 }

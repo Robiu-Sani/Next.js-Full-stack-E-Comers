@@ -31,7 +31,6 @@ export default function OtpForm() {
     }
 
     setIsSubmitting(true);
-    console.log({ identifier, code: otp });
     try {
       const res = await fetch("/api/v1/user/manage", {
         method: "PATCH",
@@ -40,7 +39,6 @@ export default function OtpForm() {
         credentials: "include",
       });
 
-      console.log(res);
       const data = await res.json();
 
       if (!res.ok) {
