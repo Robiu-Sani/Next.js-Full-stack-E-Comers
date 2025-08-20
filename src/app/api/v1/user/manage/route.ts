@@ -69,9 +69,7 @@ export async function POST(request: NextRequest) {
     if (!isSocial) {
       // Generate and send OTP for non-social signups
       const otp = generateOTP();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-      await OtpModel.create({ identifier, code: otp, expiresAt });
+      await OtpModel.create({ identifier, code: otp });
 
       if (email) {
         await sendEmail({
