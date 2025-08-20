@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
@@ -8,19 +9,115 @@ import ProfileInfoPart from "./childrens-component/ProfileInfoPart";
 import OverViewPart from "./childrens-component/OverViewPart";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, ShoppingBag, Heart, ShoppingCart, Home } from "lucide-react";
+import {
+  User,
+  ShoppingBag,
+  Heart,
+  ShoppingCart,
+  Home,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
+
+interface UserData {
+  _id: string;
+  email: string;
+  password: string;
+  role: string;
+  status: string;
+  isSocial: boolean;
+  isActive: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface Contact {
+  contactName: string;
+  contact: string;
+  _id: string;
+}
+
+interface Address {
+  addressName: string;
+  district: string;
+  city: string;
+  addressLine: string;
+  _id: string;
+}
+
+interface ProfileData {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+  user: UserData;
+  number: string;
+  dateOfBirth: string;
+  contacts: Contact[];
+  address: Address[];
+  image: string;
+  orders: any[];
+  isDeleted: boolean;
+  bio: string;
+  referralCode: string;
+  loyaltyPoints: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: ProfileData;
+}
 
 export default function UserProfile() {
   const [activeTab, setActiveTab] = useState("profile");
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
-  // Sync tab with URL query parameter
+  // Fetch profile data
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`/api/v1/profile`, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch profile: ${res.status}`);
+      }
+
+      const data: ApiResponse = await res.json();
+
+      if (data.success && data.data) {
+        setProfileData(data.data);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError(err instanceof Error ? err.message : "Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sync tab with URL query parameter and fetch data
   useEffect(() => {
     const tab = searchParams?.get("tab");
     if (tab && tabs.some((t) => t.id === tab)) {
       setActiveTab(tab);
     }
+
+    fetchProfileData();
   }, [searchParams]);
 
   const tabs = [
@@ -45,8 +142,14 @@ export default function UserProfile() {
       icon: User,
       component: (
         <div className="space-y-6">
-          <ProfileImagePart />
-          <ProfileInfoPart />
+          <ProfileImagePart
+            image={profileData?.image || null}
+            name={profileData?.name || null}
+            email={profileData?.email || profileData?.user?.email || null}
+            number={profileData?.number || null}
+            role={profileData?.user?.role || null}
+          />
+          <ProfileInfoPart profileData={profileData || null} />
           <OverViewPart />
         </div>
       ),
@@ -79,22 +182,51 @@ export default function UserProfile() {
     window.history.replaceState({}, "", url.toString());
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Error: {error}</p>
+          <Button onClick={fetchProfileData} className="gap-2">
+            <Loader2 className="h-4 w-4" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-      {" "}
-      {/* Added padding for mobile bottom nav */}
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Desktop Layout */}
         <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 gap-6">
           {/* Left Side - 3/5 width */}
           <div className="md:col-span-2 lg:col-span-3 space-y-6">
-            <ProfileImagePart />
+            <ProfileImagePart
+              image={profileData?.image || null}
+              name={profileData?.name || null}
+              email={profileData?.email || profileData?.user?.email || null}
+              number={profileData?.number || null}
+              role={profileData?.user?.role || null}
+            />
             <OverViewPart />
           </div>
 
           {/* Right Side - 2/5 width */}
           <div className="md:col-span-2 lg:col-span-2">
-            <ProfileInfoPart />
+            <ProfileInfoPart profileData={profileData || null} />
           </div>
         </div>
 
@@ -134,7 +266,9 @@ export default function UserProfile() {
                 >
                   <tab.icon className="h-4 w-4" />
                   {tab.id === "home" ? (
-                    <Link href="/">{tab.label}</Link>
+                    <Link href="/" className="hover:underline">
+                      {tab.label}
+                    </Link>
                   ) : (
                     tab.label
                   )}
@@ -154,13 +288,18 @@ export default function UserProfile() {
           </Tabs>
         </div>
       </div>
+
       {/* Fixed Bottom Navigation Bar - Mobile Only */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
         <div className="grid grid-cols-5 h-16">
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
+              onClick={() =>
+                tab.id === "home"
+                  ? (window.location.href = "/")
+                  : handleTabChange(tab.id)
+              }
               className={`flex flex-col items-center justify-center p-2 transition-colors ${
                 activeTab === tab.id
                   ? "text-primary bg-primary/10"
@@ -168,13 +307,7 @@ export default function UserProfile() {
               }`}
             >
               <tab.icon className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium">
-                {tab.id === "home" ? (
-                  <Link href="/">{tab.label}</Link>
-                ) : (
-                  tab.label
-                )}
-              </span>
+              <span className="text-xs font-medium">{tab.label}</span>
             </button>
           ))}
         </div>

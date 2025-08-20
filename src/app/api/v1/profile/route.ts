@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     // Find customer profile for this user
     const customer = await CustomerModel.findOne({ user: user._id })
-      .populate("user", "name email role")
+      .populate("user")
       .lean();
 
     if (!customer) {
