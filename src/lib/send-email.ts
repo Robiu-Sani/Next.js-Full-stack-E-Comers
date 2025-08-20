@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import nodemailer from "nodemailer";
 
 interface SendEmailOptions {
   to: string | string[];
   subject: string;
-  text: string;
+  text: any;
 }
 
 export const sendEmail = async ({ to, subject, text }: SendEmailOptions) => {
@@ -25,9 +26,6 @@ export const sendEmail = async ({ to, subject, text }: SendEmailOptions) => {
       text,
     });
 
-    console.log(
-      `Email sent to ${info.accepted.join(", ")}, messageId: ${info.messageId}`
-    );
     return info;
   } catch (error) {
     console.error("Failed to send email:", error);

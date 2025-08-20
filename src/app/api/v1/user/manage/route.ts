@@ -13,34 +13,59 @@ const generateOTP = () =>
 export async function POST(request: NextRequest) {
   try {
     const signUpData = await request.json();
-    const { email, number, isSocial } = signUpData;
+    const { email, number, password, isSocial = false } = signUpData;
+
     await connectDb();
 
-    // Determine the identifier (email or number)
-    const identifier = email || number;
-    if (!identifier) {
+    // Validate input
+    if (!email && !number) {
       return NextResponse.json(
         { success: false, error: "Email or number is required" },
         { status: 400 }
       );
     }
 
-    let existingUser;
+    if (!isSocial && !password) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Password is required for non-social signups",
+        },
+        { status: 400 }
+      );
+    }
 
+    // Check if user exists with email or number
+    let existingUser;
     if (email) {
-      existingUser = await UserModel.findOne({ email: email });
-    } else {
-      existingUser = await UserModel.findOne({ number: number });
+      existingUser = await UserModel.findOne({
+        $or: [
+          { email: email.toLowerCase().trim(), isDeleted: false },
+          { email: email.toLowerCase().trim(), isDeleted: { $exists: false } },
+        ],
+      });
+    } else if (number) {
+      existingUser = await UserModel.findOne({
+        $or: [
+          { number: number.trim(), isDeleted: false },
+          { number: number.trim(), isDeleted: { $exists: false } },
+        ],
+      });
     }
 
     if (existingUser) {
       if (existingUser.isActive) {
-        // User exists and is active - no need to create new account
+        // User exists and is active
         return NextResponse.json(
           {
             success: false,
-            error: "User already exists and is active",
-            user: existingUser,
+            error: "User already exists with this email/number",
+            user: {
+              _id: existingUser._id,
+              email: existingUser.email,
+              number: existingUser.number,
+              isActive: existingUser.isActive,
+            },
           },
           { status: 409 }
         );
@@ -49,51 +74,85 @@ export async function POST(request: NextRequest) {
         await UserModel.findByIdAndDelete(existingUser._id);
 
         // Also delete any pending OTPs for this identifier
+        const identifier = email || number;
         await OtpModel.deleteMany({ identifier });
       }
     }
 
     // Prepare user data
-    if (isSocial) {
-      signUpData.password = "password";
-      signUpData.isSocial = true;
-      signUpData.isActive = true;
-    } else {
-      signUpData.isActive = false;
-    }
+    const userData: any = {
+      email: email ? email.toLowerCase().trim() : undefined,
+      number: number ? number.trim() : undefined,
+      password: password || undefined,
+      isSocial,
+      isActive: isSocial, // Social users are active immediately
+      status: "in-progress",
+    };
 
     // Create new user
-    const newUser = new UserModel(signUpData);
+    const newUser = new UserModel(userData);
     const savedUser = await newUser.save();
 
     if (!isSocial) {
       // Generate and send OTP for non-social signups
       const otp = generateOTP();
-      await OtpModel.create({ identifier, code: otp });
+      const identifier = email || number;
+
+      await OtpModel.create({
+        identifier,
+        code: otp,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes expiry
+      });
 
       if (email) {
         await sendEmail({
           to: email,
           subject: "Verify Your Account",
-          text: `Your verification code is ${otp}`,
+          text: `
+            <div>
+              <h2>Verify Your Account</h2>
+              <p>Your verification code is: <strong>${otp}</strong></p>
+              <p>This code will expire in 15 minutes.</p>
+            </div>
+          `,
         });
       } else if (number) {
         await sendSMS({
           to: number,
-          message: `Your verification code is ${otp}`,
+          message: `Your verification code is ${otp}. This code will expire in 15 minutes.`,
         });
       }
     }
 
     return NextResponse.json({
       success: true,
-      message: "User created successfully",
-      user: savedUser,
+      message: isSocial
+        ? "User created successfully"
+        : "User created successfully. Please verify your account.",
+      user: {
+        _id: savedUser._id,
+        email: savedUser.email,
+        number: savedUser.number,
+        isActive: savedUser.isActive,
+      },
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("User registration error:", err);
+
+    // Handle duplicate key error (unique constraint violation)
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyValue)[0];
+      return NextResponse.json(
+        {
+          success: false,
+          error: `User with this ${field} already exists`,
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      { success: false, error: "Registration failed" },
+      { success: false, error: "Registration failed. Please try again." },
       { status: 500 }
     );
   }

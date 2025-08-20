@@ -137,24 +137,6 @@ export default function UserProfile() {
       ),
     },
     {
-      id: "profile",
-      label: "Profile",
-      icon: User,
-      component: (
-        <div className="space-y-6">
-          <ProfileImagePart
-            image={profileData?.image || null}
-            name={profileData?.name || null}
-            email={profileData?.email || profileData?.user?.email || null}
-            number={profileData?.number || null}
-            role={profileData?.user?.role || null}
-          />
-          <ProfileInfoPart profileData={profileData || null} />
-          <OverViewPart />
-        </div>
-      ),
-    },
-    {
       id: "orders",
       label: "Orders",
       icon: ShoppingBag,
@@ -210,7 +192,7 @@ export default function UserProfile() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
       <div className="container mx-auto px-4 py-6 md:py-8">
-        {/* Desktop Layout */}
+        {/* Desktop Layout - Always show profile info on desktop */}
         <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-5 gap-6">
           {/* Left Side - 3/5 width */}
           <div className="md:col-span-2 lg:col-span-3 space-y-6">
@@ -237,7 +219,21 @@ export default function UserProfile() {
             onValueChange={handleTabChange}
             className="w-full"
           >
-            {/* Tab Contents */}
+            {/* Mobile Tab Contents - Include profile tab */}
+            <TabsContent value="profile" className="mt-0">
+              <div className="space-y-6">
+                <ProfileImagePart
+                  image={profileData?.image || null}
+                  name={profileData?.name || null}
+                  email={profileData?.email || profileData?.user?.email || null}
+                  number={profileData?.number || null}
+                  role={profileData?.user?.role || null}
+                />
+                <ProfileInfoPart profileData={profileData || null} />
+                <OverViewPart />
+              </div>
+            </TabsContent>
+
             {tabs.map((tab) => (
               <TabsContent key={tab.id} value={tab.id} className="mt-0">
                 {tab.id === "home" ? (
@@ -250,7 +246,7 @@ export default function UserProfile() {
           </Tabs>
         </div>
 
-        {/* Desktop Tabs */}
+        {/* Desktop Tabs - Only show non-profile tabs */}
         <div className="hidden md:block mt-8">
           <Tabs
             value={activeTab}
@@ -292,6 +288,19 @@ export default function UserProfile() {
       {/* Fixed Bottom Navigation Bar - Mobile Only */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
         <div className="grid grid-cols-5 h-16">
+          {/* Mobile tabs including profile */}
+          <button
+            onClick={() => handleTabChange("profile")}
+            className={`flex flex-col items-center justify-center p-2 transition-colors ${
+              activeTab === "profile"
+                ? "text-primary bg-primary/10"
+                : "text-gray-600 hover:text-primary"
+            }`}
+          >
+            <User className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">Profile</span>
+          </button>
+
           {tabs.map((tab) => (
             <button
               key={tab.id}
