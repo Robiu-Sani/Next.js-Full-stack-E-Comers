@@ -91,8 +91,7 @@ export default function UserProfile() {
         credentials: "include",
         cache: "no-store",
       });
-      console.log(res);
-      if (res.statusText == "Not Found") {
+      if (res.statusText == "Not Found" || res.status == 404) {
         router.push("/complete-account");
       }
       if (!res.ok) {
