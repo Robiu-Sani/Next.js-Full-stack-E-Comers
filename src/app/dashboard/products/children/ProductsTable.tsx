@@ -194,7 +194,7 @@ export default function ProductsTable() {
   };
 
   return (
-    <div className="w-full mt-4 space-y-4">
+    <div className="w-full mt-4 scrollHidden space-y-4">
       <div className="flex items-center justify-between">
         <Input
           placeholder="Search products..."

@@ -7,6 +7,10 @@
 }
 /* custom css classes end from there  */
 
+.scrollHidden::-webkit-scrollbar {
+  display: none;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, context: ParamsType) {
   const { id } = await context.params;
   try {
     await connectDb();
-    await auth(USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN);
+    await auth(USER_ROLE.SUPER_ADMIN);
 
     const body = await req.json();
 
