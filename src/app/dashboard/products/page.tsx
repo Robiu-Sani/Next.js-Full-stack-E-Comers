@@ -1,7 +1,10 @@
-import React from 'react'
+import React from "react";
+import ProductParent from "./ProductParent";
 
 export default function page() {
   return (
-    <div>page</div>
-  )
+    <div className="overflow-x-auto">
+      <ProductParent />
+    </div>
+  );
 }
