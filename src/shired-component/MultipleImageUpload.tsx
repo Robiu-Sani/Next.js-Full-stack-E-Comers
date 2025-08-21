@@ -10,11 +10,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
+interface MultipleImageUploadProps {
+  onUpload: (urls: string[]) => void;
+  initialImages?: string[];
+}
+
 export default function MultipleImageUpload({
   onUpload,
-}: {
-  onUpload: (urls: string[]) => void;
-}) {
+  initialImages = [],
+}: MultipleImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<"success" | "error" | null>(
     null
@@ -23,7 +27,7 @@ export default function MultipleImageUpload({
   const [previews, setPreviews] = useState<{ file: File; preview: string }[]>(
     []
   );
-  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>(initialImages);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
@@ -37,13 +41,22 @@ export default function MultipleImageUpload({
     setPreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const removeImage = (index: number) => {
-    setPreviews((prev) => {
-      const newPreviews = [...prev];
-      URL.revokeObjectURL(newPreviews[index].preview);
-      newPreviews.splice(index, 1);
-      return newPreviews;
-    });
+  const removeImage = (index: number, type: "preview" | "uploaded") => {
+    if (type === "preview") {
+      setPreviews((prev) => {
+        const newPreviews = [...prev];
+        URL.revokeObjectURL(newPreviews[index].preview);
+        newPreviews.splice(index, 1);
+        return newPreviews;
+      });
+    } else {
+      setUploadedUrls((prev) => {
+        const newUrls = [...prev];
+        newUrls.splice(index, 1);
+        onUpload(newUrls); // Update parent component
+        return newUrls;
+      });
+    }
   };
 
   const uploadImages = useCallback(async () => {
@@ -75,12 +88,14 @@ export default function MultipleImageUpload({
           throw new Error("Failed to upload image");
         }
 
-        return response.data.url;
+        return response.data.secure_url || response.data.url;
       });
 
       const urls = await Promise.all(uploadPromises);
-      setUploadedUrls(urls);
-      onUpload(urls);
+      const allUrls = [...uploadedUrls, ...urls];
+      setUploadedUrls(allUrls);
+      onUpload(allUrls);
+      setPreviews([]);
       setUploadStatus("success");
     } catch (error) {
       console.error("Error uploading images:", error);
@@ -89,7 +104,7 @@ export default function MultipleImageUpload({
     } finally {
       setIsUploading(false);
     }
-  }, [previews, onUpload]);
+  }, [previews, uploadedUrls, onUpload]);
 
   return (
     <div className="space-y-4">
@@ -138,14 +153,15 @@ export default function MultipleImageUpload({
           </label>
         </div>
 
+        {/* Preview images (newly selected but not yet uploaded) */}
         {previews.length > 0 && (
           <div className="mt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Selected files ({previews.length})
+              New images to upload ({previews.length})
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
               {previews.map((preview, index) => (
-                <div key={index} className="relative group">
+                <div key={`preview-${index}`} className="relative group">
                   <div className="aspect-square rounded-md overflow-hidden border border-gray-200">
                     <Image
                       width={100}
@@ -157,7 +173,7 @@ export default function MultipleImageUpload({
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeImage(index)}
+                    onClick={() => removeImage(index, "preview")}
                     className="absolute top-1 right-1 p-1 bg-white rounded-full shadow-sm hover:bg-red-50 transition-colors"
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />
@@ -165,6 +181,37 @@ export default function MultipleImageUpload({
                   <div className="mt-1 text-xs text-gray-500 truncate">
                     {preview.file.name}
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Already uploaded images */}
+        {uploadedUrls.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Uploaded images ({uploadedUrls.length})
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {uploadedUrls.map((url, index) => (
+                <div key={`uploaded-${index}`} className="relative group">
+                  <div className="aspect-square rounded-md overflow-hidden border border-gray-200">
+                    <Image
+                      width={100}
+                      height={100}
+                      src={url}
+                      alt={`Uploaded ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index, "uploaded")}
+                    className="absolute top-1 right-1 p-1 bg-white rounded-full shadow-sm hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -194,8 +241,8 @@ export default function MultipleImageUpload({
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <CheckCircle2 className="w-4 h-4 text-green-500" />
           <span>
-            Successfully uploaded {uploadedUrls.length} image
-            {uploadedUrls.length > 1 ? "s" : ""}!
+            Successfully uploaded {previews.length} image
+            {previews.length > 1 ? "s" : ""}!
           </span>
         </div>
       )}

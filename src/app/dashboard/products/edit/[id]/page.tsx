@@ -1,5 +1,10 @@
 import React from "react";
+import EditProductPage from "./EditProductPage";
 
 export default function page() {
-  return <div>page</div>;
+  return (
+    <div>
+      <EditProductPage />
+    </div>
+  );
 }
