@@ -197,15 +197,20 @@ export async function PATCH(request: NextRequest) {
         email: user.email,
         number: user.number,
       },
-      process.env.NEXT_PUBLIC_JWT_ACCESS_SECRET!,
+      process.env.NEXT_PUBLIC_JWT_ACCESS_SECRET as string,
       {
         expiresIn: process.env.NEXT_PUBLIC_EXPIRE_ACCESS_TOKEN_IN || "5h",
       } as jwt.SignOptions
     );
 
     const refreshToken = jwt.sign(
-      { userId: user._id },
-      process.env.NEXT_PUBLIC_JWT_REFRESH_SECRET!,
+      {
+        userId: user._id,
+        role: user.role,
+        email: user.email,
+        number: user.number,
+      },
+      process.env.NEXT_PUBLIC_JWT_REFRESH_SECRET as string,
       {
         expiresIn: process.env.NEXT_PUBLIC_EXPIRE_REFRESH_TOKEN_IN || "90d",
       } as jwt.SignOptions
