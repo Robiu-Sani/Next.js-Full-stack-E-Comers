@@ -160,8 +160,8 @@ export const data = {
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
+      name: "Customer checker",
+      url: "/dashboard/customer-checker",
       icon: Frame,
     },
     {

@@ -18,6 +18,19 @@ next auth value
 https://myaccount.google.com/apppasswords
 // bulk message dosc
 https://bulksmsbd.com/bulksms-api-bangladesh.php
+// bdcourier
+https://bdcourier.com/api/courier-check
+
+  const response = await axios.post(
+        `https://bdcourier.com/api/courier-check?phone=${phone}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
+        }
+      );
+---------------------------------
 
 
 Divisons
