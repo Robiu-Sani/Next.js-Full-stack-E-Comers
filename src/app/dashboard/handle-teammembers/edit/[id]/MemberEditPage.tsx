@@ -101,7 +101,7 @@ export default function MemberEditPage() {
     const fetchMember = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/v1/handle-teammembers/${id}`, {
+        const res = await fetch(`/api/v1/management/${id}`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -313,7 +313,7 @@ export default function MemberEditPage() {
         description: data.message || "Your member has been updated",
       });
 
-      router.push("/dashboard/handle-teammembers");
+      router.push("/dashboard/management");
     } catch (error: unknown) {
       console.error("Error updating member:", error);
       toast.error("Failed to update member", {
@@ -724,7 +724,7 @@ export default function MemberEditPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/dashboard/handle-teammembers")}
+                onClick={() => router.push("/dashboard/management")}
                 disabled={isSubmitting}
               >
                 Cancel
