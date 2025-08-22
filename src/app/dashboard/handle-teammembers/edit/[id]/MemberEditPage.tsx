@@ -101,7 +101,7 @@ export default function MemberEditPage() {
     const fetchMember = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/v1/management/${id}`, {
+        const res = await fetch(`/api/v1/handle-teammembers/${id}`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -294,7 +294,7 @@ export default function MemberEditPage() {
           : undefined,
       };
 
-      const res = await fetch(`/api/v1/management/${id}`, {
+      const res = await fetch(`/api/v1/handle-teammembers/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -313,7 +313,7 @@ export default function MemberEditPage() {
         description: data.message || "Your member has been updated",
       });
 
-      router.push("/dashboard/management");
+      router.push("/dashboard/handle-teammembers");
     } catch (error: unknown) {
       console.error("Error updating member:", error);
       toast.error("Failed to update member", {
@@ -337,7 +337,7 @@ export default function MemberEditPage() {
     <div className="container mx-auto py-6">
       <div className="flex items-center gap-4 mb-6">
         <Button variant="outline" size="icon" asChild>
-          <Link href="/dashboard/management">
+          <Link href="/dashboard/handle-teammembers">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -724,7 +724,7 @@ export default function MemberEditPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/dashboard/management")}
+                onClick={() => router.push("/dashboard/handle-teammembers")}
                 disabled={isSubmitting}
               >
                 Cancel
