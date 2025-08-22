@@ -7,6 +7,7 @@ import AosWrapper from "@/defaults/aos-wrapper/AosWrapper";
 import NextTopLoader from "nextjs-toploader";
 import Context from "@/defaults/context/Context";
 import ThemeProvider from "@/components/theme-provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
               zIndex={99999999999}
             />
             <Context>
+              <Toaster className="z-[999999]" />
               <ParentNav />
               {children}
               <ParentFooter />
