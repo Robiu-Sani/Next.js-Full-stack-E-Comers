@@ -1,5 +1,10 @@
 import React from "react";
+import CustomerEditPage from "./CustomerEditPage";
 
 export default function page() {
-  return <div>page</div>;
+  return (
+    <div>
+      <CustomerEditPage />
+    </div>
+  );
 }

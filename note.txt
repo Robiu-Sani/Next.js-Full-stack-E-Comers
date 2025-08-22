@@ -4,9 +4,7 @@ District // City/Upazila
 
 
 // frontend
-otp verify 
-tenstack query
-next-auth
+customer orders need to add in customer details 
 
 // need to get from client
 uri

@@ -55,8 +55,8 @@ export interface ICustomer {
     role: string;
   };
   isDeleted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function AllCustomersTable() {
@@ -129,6 +129,20 @@ export default function AllCustomersTable() {
 
   const handleViewDetails = (id: string) => {
     router.push(`/dashboard/handle-customers/details/${id}`);
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.error("Error formatting date:", error, dateString);
+      return "Invalid Date";
+    }
   };
 
   const handleDeleteClick = (id: string, isDeleted: boolean) => {
@@ -280,9 +294,7 @@ export default function AllCustomersTable() {
                       {customer.user.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    {new Date(customer.createdAt).toLocaleDateString()}
-                  </TableCell>
+                  <TableCell>{formatDate(customer.createdAt)}</TableCell>
                   <TableCell>
                     <Badge
                       variant={customer.isDeleted ? "destructive" : "default"}

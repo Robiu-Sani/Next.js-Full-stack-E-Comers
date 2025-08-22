@@ -77,29 +77,42 @@ export async function DELETE(request: NextRequest, context: ParamsType) {
   const { id } = await context.params;
   try {
     await connectDb();
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      id,
-      { isDeleted: true },
-      {
-        new: true,
-        runValidators: true,
-      }
-    ).select("-password");
-    if (!updatedUser) {
+
+    // First find the current user to check the current isDeleted value
+    const currentUser = await UserModel.findById(id);
+
+    if (!currentUser) {
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
     }
+
+    // Toggle the isDeleted value (true becomes false, false becomes true)
+    const newIsDeletedValue = !currentUser.isDeleted;
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { isDeleted: newIsDeletedValue },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
+
+    const actionMessage = newIsDeletedValue
+      ? "User deleted successfully"
+      : "User restored successfully";
+
     return NextResponse.json({
       success: true,
-      message: "User updated successfully",
+      message: actionMessage,
       data: updatedUser,
     });
   } catch (err) {
-    console.error("PATCH user error:", err);
+    console.error("DELETE user error:", err);
     return NextResponse.json(
-      { success: false, message: "Failed to update user" },
+      { success: false, message: "Failed to update user status" },
       { status: 500 }
     );
   }

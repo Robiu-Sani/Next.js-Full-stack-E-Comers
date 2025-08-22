@@ -4,6 +4,7 @@ import connectDb from "@/lib/connectdb";
 import CustomerModel from "@/models/customer.model";
 import { auth } from "@/lib/auth";
 import { USER_ROLE } from "@/interface/auth.constent";
+import UserModel from "@/models/user.model";
 
 type ParamsType = {
   params: Promise<{
@@ -93,6 +94,15 @@ export async function DELETE(request: NextRequest, context: ParamsType) {
 
     // Toggle isDeleted value (true becomes false, false becomes true)
     const newIsDeletedValue = !customer.isDeleted;
+
+    await UserModel.findByIdAndUpdate(
+      customer.user,
+      { isDeleted: newIsDeletedValue },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
 
     const updatedCustomer = await CustomerModel.findByIdAndUpdate(
       id,
