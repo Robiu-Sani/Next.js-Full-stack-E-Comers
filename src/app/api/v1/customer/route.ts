@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     const total = await CustomerModel.countDocuments(query);
     const customers = await CustomerModel.find(query)
       .populate("user", "email number username role")
-      .select("name image")
+      .select("name image createdAt")
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });

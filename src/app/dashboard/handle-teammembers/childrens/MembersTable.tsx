@@ -42,44 +42,43 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export interface ICustomer {
+export interface IManagement {
   _id: string;
   name: string;
-  username?: string;
-  email?: string;
-  number?: string;
   image?: string;
   user: {
     _id: string;
     email: string;
+    number?: string;
+    username?: string;
     role: string;
-  };
-  isDeleted: boolean;
+  } | null;
   createdAt: string;
   updatedAt: string;
+  isDeleted?: boolean;
 }
 
-export default function AllCustomersTable() {
+export default function MembersTable() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersData, setCustomersData] = useState<ICustomer[]>([]);
-  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [managementData, setManagementData] = useState<IManagement[]>([]);
+  const [totalManagement, setTotalManagement] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
-    null
-  );
+  const [selectedManagementId, setSelectedManagementId] = useState<
+    string | null
+  >(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteInfo, setDeleteInfo] = useState(false);
   const itemsPerPage = 50;
 
-  // Fetch customers data
-  const fetchCustomers = async () => {
+  // Fetch management data
+  const fetchManagement = async () => {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `/api/v1/customer?search=${searchTerm}&page=${currentPage}&limit=${itemsPerPage}`,
+        `/api/v1/management?search=${searchTerm}&page=${currentPage}&limit=${itemsPerPage}`,
         {
           method: "GET",
           credentials: "include",
@@ -89,39 +88,39 @@ export default function AllCustomersTable() {
 
       const data = await res.json();
       if (data.success) {
-        setCustomersData(data.data);
-        setTotalCustomers(data.pagination.total);
+        setManagementData(data.data);
+        setTotalManagement(data.pagination.total);
       } else {
-        toast.error("Failed to fetch customers");
+        toast.error("Failed to fetch management data");
       }
     } catch (error) {
-      console.error("Error fetching customers:", error);
-      toast.error("Failed to fetch customers");
+      console.error("Error fetching management data:", error);
+      toast.error("Failed to fetch management data");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCustomers();
+    fetchManagement();
   }, [searchTerm, currentPage]);
 
-  // Filter customers based on search term
-  const filteredCustomers = customersData.filter((customer) => {
+  // Filter management based on search term
+  const filteredManagement = managementData.filter((item) => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      customer.name.toLowerCase().includes(searchLower) ||
-      (customer.email && customer.email.toLowerCase().includes(searchLower)) ||
-      (customer.number &&
-        customer.number.toLowerCase().includes(searchLower)) ||
-      (customer.username &&
-        customer.username.toLowerCase().includes(searchLower)) ||
-      customer.user.email.toLowerCase().includes(searchLower)
+      item.name.toLowerCase().includes(searchLower) ||
+      (item.user?.email &&
+        item.user.email.toLowerCase().includes(searchLower)) ||
+      (item.user?.number &&
+        item.user.number.toLowerCase().includes(searchLower)) ||
+      (item.user?.username &&
+        item.user.username.toLowerCase().includes(searchLower))
     );
   });
 
   // Pagination logic
-  const totalPages = Math.ceil(totalCustomers / itemsPerPage);
+  const totalPages = Math.ceil(totalManagement / itemsPerPage);
 
   const handleEdit = (id: string) => {
     router.push(`/dashboard/handle-customers/edit/${id}`);
@@ -132,54 +131,57 @@ export default function AllCustomersTable() {
   };
 
   const handleDeleteClick = (id: string, isDeleted: boolean) => {
-    setSelectedCustomerId(id);
+    setSelectedManagementId(id);
     setDeleteDialogOpen(true);
     setDeleteInfo(isDeleted);
   };
 
   const confirmDelete = async () => {
-    if (!selectedCustomerId) return;
+    if (!selectedManagementId) return;
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/v1/customer/${selectedCustomerId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `/api/v1/management/${selectedManagementId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 
       if (data.success) {
         toast.success(
-          `Customer ${deleteInfo ? "restored" : "deleted"} successfully`
+          `Management ${deleteInfo ? "restored" : "deleted"} successfully`
         );
 
         // Update the local state instead of refetching to immediately reflect the change
-        setCustomersData((prevCustomers) =>
-          prevCustomers.map((customer) =>
-            customer._id === selectedCustomerId
-              ? { ...customer, isDeleted: !deleteInfo }
-              : customer
+        setManagementData((prevManagement) =>
+          prevManagement.map((item) =>
+            item._id === selectedManagementId
+              ? { ...item, isDeleted: !deleteInfo }
+              : item
           )
         );
 
         // Also update the total count if needed
         if (deleteInfo) {
-          setTotalCustomers((prev) => prev + 1);
+          setTotalManagement((prev) => prev + 1);
         } else {
-          setTotalCustomers((prev) => prev - 1);
+          setTotalManagement((prev) => prev - 1);
         }
       } else {
         toast.error(
           data.message ||
-            `Failed to ${deleteInfo ? "restore" : "delete"} customer`
+            `Failed to ${deleteInfo ? "restore" : "delete"} management`
         );
       }
     } catch (error) {
-      console.error("Error updating customer:", error);
-      toast.error(`Failed to ${deleteInfo ? "restore" : "delete"} customer`);
+      console.error("Error updating management:", error);
+      toast.error(`Failed to ${deleteInfo ? "restore" : "delete"} management`);
     } finally {
       setDeleteDialogOpen(false);
-      setSelectedCustomerId(null);
+      setSelectedManagementId(null);
       setIsSubmitting(false);
     }
   };
@@ -202,24 +204,32 @@ export default function AllCustomersTable() {
     }
   };
 
+  const getStatusVariant = (isDeleted?: boolean) => {
+    return isDeleted ? "destructive" : "default";
+  };
+
+  const getStatusText = (isDeleted?: boolean) => {
+    return isDeleted ? "Deleted" : "Active";
+  };
+
   return (
     <div className="w-full mt-4 space-y-4">
       <div className="flex items-center justify-between">
         <Input
-          placeholder="Search customers by name, email, or number..."
+          placeholder="Search management by name, email, or number..."
           value={searchTerm}
           onChange={handleSearch}
           className="max-w-sm"
         />
-        <Button variant="secondary">Total Data {totalCustomers}</Button>
+        <Button variant="secondary">Total Data {totalManagement}</Button>
       </div>
 
       <div className="rounded-md border">
         <Table>
-          <TableCaption>A list of all customers.</TableCaption>
+          <TableCaption>A list of all management members.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Customer</TableHead>
+              <TableHead>Member</TableHead>
               <TableHead>Contact Info</TableHead>
               <TableHead>User Role</TableHead>
               <TableHead>Created At</TableHead>
@@ -236,16 +246,16 @@ export default function AllCustomersTable() {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : filteredCustomers.length > 0 ? (
-              filteredCustomers.map((customer) => (
-                <TableRow key={customer._id}>
+            ) : filteredManagement.length > 0 ? (
+              filteredManagement.map((item) => (
+                <TableRow key={item._id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                        {customer.image ? (
+                        {item.image ? (
                           <Image
-                            src={customer.image || "/placeholder-user.jpg"}
-                            alt={customer.name}
+                            src={item.image || "/placeholder-user.jpg"}
+                            alt={item.name}
                             fill
                             className="object-cover"
                           />
@@ -256,10 +266,10 @@ export default function AllCustomersTable() {
                         )}
                       </div>
                       <div>
-                        <p className="font-medium">{customer.name}</p>
-                        {customer.username && (
+                        <p className="font-medium">{item.name}</p>
+                        {item.user?.username && (
                           <p className="text-sm text-gray-500">
-                            @{customer.username}
+                            @{item.user.username}
                           </p>
                         )}
                       </div>
@@ -267,29 +277,32 @@ export default function AllCustomersTable() {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      {customer.email && (
-                        <p className="text-sm">{customer.email}</p>
+                      {item.user?.email && (
+                        <p className="text-sm">{item.user.email}</p>
                       )}
-                      {customer.number && (
-                        <p className="text-sm">{customer.number}</p>
+                      {item.user?.number && (
+                        <p className="text-sm">{item.user.number}</p>
+                      )}
+                      {!item.user && (
+                        <p className="text-sm text-gray-400">No user account</p>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleVariant(customer.user.role)}>
-                      {customer.user.role}
-                    </Badge>
+                    {item.user ? (
+                      <Badge variant={getRoleVariant(item.user.role)}>
+                        {item.user.role}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">No Role</Badge>
+                    )}
                   </TableCell>
                   <TableCell>
-                    {new Date(customer.createdAt).toLocaleDateString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        customer.isDeleted === true ? "destructive" : "default"
-                      }
-                    >
-                      {customer.isDeleted === true ? "Deleted" : "Active"}
+                    <Badge variant={getStatusVariant(item.isDeleted)}>
+                      {getStatusText(item.isDeleted)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -303,14 +316,14 @@ export default function AllCustomersTable() {
                       <DropdownMenuContent align="end" className="z-[1000]">
                         <DropdownMenuItem
                           className="flex items-center gap-2"
-                          onClick={() => handleViewDetails(customer._id)}
+                          onClick={() => handleViewDetails(item._id)}
                         >
                           <Eye className="h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="flex items-center gap-2"
-                          onClick={() => handleEdit(customer._id)}
+                          onClick={() => handleEdit(item._id)}
                         >
                           <Edit className="h-4 w-4" />
                           Edit
@@ -318,11 +331,11 @@ export default function AllCustomersTable() {
                         <DropdownMenuItem
                           className="flex items-center gap-2 text-red-600"
                           onClick={() =>
-                            handleDeleteClick(customer._id, customer.isDeleted)
+                            handleDeleteClick(item._id, item.isDeleted || false)
                           }
                         >
                           <Trash2 className="h-4 w-4" />
-                          {customer.isDeleted ? "Restore" : "Delete"}
+                          {item.isDeleted ? "Restore" : "Delete"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -332,7 +345,7 @@ export default function AllCustomersTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
-                  No customers found.
+                  No management members found.
                 </TableCell>
               </TableRow>
             )}
@@ -344,8 +357,8 @@ export default function AllCustomersTable() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
           Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, totalCustomers)} of{" "}
-          {totalCustomers} customers
+          {Math.min(currentPage * itemsPerPage, totalManagement)} of{" "}
+          {totalManagement} members
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -376,10 +389,10 @@ export default function AllCustomersTable() {
             <DialogTitle>Confirm Action</DialogTitle>
             <DialogDescription>
               Are you sure you want to {deleteInfo ? "restore" : "delete"} this
-              customer?{" "}
+              management member?{" "}
               {deleteInfo
                 ? "They will be accessible again."
-                : "This action will soft delete the customer."}
+                : "This action will soft delete the member."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
