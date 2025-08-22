@@ -123,11 +123,11 @@ export default function MembersTable() {
   const totalPages = Math.ceil(totalManagement / itemsPerPage);
 
   const handleEdit = (id: string) => {
-    router.push(`/dashboard/handle-customers/edit/${id}`);
+    router.push(`/dashboard/handle-teammembers/edit/${id}`);
   };
 
   const handleViewDetails = (id: string) => {
-    router.push(`/dashboard/handle-customers/details/${id}`);
+    router.push(`/dashboard/handle-teammembers/details/${id}`);
   };
 
   const handleDeleteClick = (id: string, isDeleted: boolean) => {
