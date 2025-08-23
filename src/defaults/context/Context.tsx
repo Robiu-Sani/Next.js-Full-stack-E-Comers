@@ -2,6 +2,7 @@
 "use client";
 
 import { createContext, useState, ReactNode, useEffect } from "react";
+import LogedUser from "../functions/LogedUser";
 
 type ContextValue = {
   test: string;
@@ -9,6 +10,7 @@ type ContextValue = {
   navItems: NavItem[];
   loading: boolean;
   error: string | null;
+  UserData: any;
 };
 
 export const ContextData = createContext<ContextValue | undefined>(undefined);
@@ -31,10 +33,12 @@ export default function Context({ children }: ContextProviderProps) {
   const [navItems, setNavItems] = useState<NavItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
+  const [UserData, setUserData] = useState();
 
   useEffect(() => {
-    const fetchNavData = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch navigation data
         const res = await fetch("/api/v1/nav", {
           method: "GET",
         });
@@ -49,8 +53,12 @@ export default function Context({ children }: ContextProviderProps) {
         } else {
           throw new Error(data.message || "Failed to fetch navigation data");
         }
+
+        // Fetch user data
+        const userinfo: any = await LogedUser();
+        setUserData(userinfo);
       } catch (err) {
-        console.error("Failed to fetch navigation data:", err);
+        console.error("Failed to fetch data:", err);
         setError(
           err instanceof Error ? err.message : "An unknown error occurred"
         );
@@ -59,7 +67,7 @@ export default function Context({ children }: ContextProviderProps) {
       }
     };
 
-    fetchNavData();
+    fetchData();
   }, []);
 
   const handleTest = (data: string) => {
@@ -72,6 +80,7 @@ export default function Context({ children }: ContextProviderProps) {
     navItems,
     loading,
     error,
+    UserData,
   };
 
   return <ContextData.Provider value={value}>{children}</ContextData.Provider>;

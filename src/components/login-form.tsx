@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import LogedUser from "@/defaults/functions/LogedUser";
 
 export function LoginForm({
   className,
@@ -38,8 +39,8 @@ export function LoginForm({
         throw new Error(data.message || "Login failed");
       }
 
-      // Redirect on successful login
-      router.push("/dashboard");
+      router.push(data.role == "user" ? "/profile" : "/dashboard");
+      await LogedUser();
     } catch (err: any) {
       setError(err.message || "An error occurred during login");
     } finally {

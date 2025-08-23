@@ -19,6 +19,7 @@ import { Plus, Trash2, User } from "lucide-react";
 import SingleImageUpload from "@/shired-component/SingleImageUpload";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import LogedUser from "@/defaults/functions/LogedUser";
 
 interface IContact {
   contactName: string;
@@ -107,6 +108,7 @@ const CompleteProfile = () => {
       if (res.ok) {
         console.log("Profile updated successfully");
         router.push("/profile");
+        await LogedUser();
       } else {
         console.error("Failed to update profile");
         // Handle error

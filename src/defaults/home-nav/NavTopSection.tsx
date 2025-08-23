@@ -2,14 +2,17 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import { LogIn, User } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
 import WishList from "./WishList";
 import CartList from "./CartList";
 import SearchBar from "./SearchBar";
+import useContextData from "../custom-component/useContextData";
 
 export default function NavTopSection() {
+  const { UserData } = useContextData();
+
   return (
     <div className="w-full  py-2 ">
       <div className="container mx-auto flex items-center justify-between px-4">
@@ -45,11 +48,19 @@ export default function NavTopSection() {
           <ModeToggle />
 
           {/* Profile Button */}
-          <Link href="/profile">
-            <Button variant="ghost" size="icon">
-              <User className="w-5 h-5" />
-            </Button>
-          </Link>
+          {UserData ? (
+            <Link href={UserData?.role == "user" ? "/profile" : "/dashboard"}>
+              <Button variant="ghost" size="icon">
+                <User className="w-5 h-5" />
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/signin">
+              <Button variant="ghost" size="icon">
+                <LogIn className="w-5 h-5" />
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

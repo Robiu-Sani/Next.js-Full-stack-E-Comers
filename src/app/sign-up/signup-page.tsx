@@ -1,8 +1,19 @@
+"use client";
 import SignupForm from "@/components/signup-form";
+import useContextData from "@/defaults/custom-component/useContextData";
 import { GalleryVerticalEnd } from "lucide-react";
-import React from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SignupPage() {
+  const { UserData } = useContextData();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (UserData) {
+      router.push(UserData.role == "user" ? "/profile" : "/dashboard");
+    }
+  }, [UserData, router]);
   return (
     <div className="grid min-h-svh container mx-auto rounded-xl mt-5 overflow-hidden border-0 sm:border lg:grid-cols-2">
       <div className="bg-gray-100  hidden  lg:block !z-10">
