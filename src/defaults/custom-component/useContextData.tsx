@@ -9,7 +9,8 @@ export default function useContextData() {
       "useContextData must be used within a ContextData.Provider"
     );
   }
-  const { test, handleTest, navItems, loading, error, UserData } = context;
+  const { test, handleTest, navItems, loading, error, UserData, handleUser } =
+    context;
   return {
     test,
     handleTest,
@@ -17,5 +18,6 @@ export default function useContextData() {
     loading,
     error,
     UserData,
+    handleUser,
   };
 }

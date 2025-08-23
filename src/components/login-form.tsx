@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import LogedUser from "@/defaults/functions/LogedUser";
+import useContextData from "@/defaults/custom-component/useContextData";
 
 export function LoginForm({
   className,
@@ -18,6 +18,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { handleUser } = useContextData();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,9 +39,13 @@ export function LoginForm({
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-
+      handleUser({
+        id: data._id,
+        role: data.role,
+        email: data?.email,
+        number: data?.number,
+      });
       router.push(data.role == "user" ? "/profile" : "/dashboard");
-      await LogedUser();
     } catch (err: any) {
       setError(err.message || "An error occurred during login");
     } finally {

@@ -11,6 +11,7 @@ type ContextValue = {
   loading: boolean;
   error: string | null;
   UserData: any;
+  handleUser: any;
 };
 
 export const ContextData = createContext<ContextValue | undefined>(undefined);
@@ -74,6 +75,10 @@ export default function Context({ children }: ContextProviderProps) {
     setTest(data);
   };
 
+  const handleUser = (data: any) => {
+    setUserData(data);
+  };
+
   const value: ContextValue = {
     test,
     handleTest,
@@ -81,6 +86,7 @@ export default function Context({ children }: ContextProviderProps) {
     loading,
     error,
     UserData,
+    handleUser,
   };
 
   return <ContextData.Provider value={value}>{children}</ContextData.Provider>;
