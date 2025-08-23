@@ -1,57 +1,56 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import LogedUser from "@/defaults/functions/LogedUser";
 import { NextResponse, NextRequest } from "next/server";
+import { jwtDecode } from "jwt-decode";
 
-const protectedRoutes = {
-  "/profile": ["user", "admin", "menager", "super-admin"],
-  "/dashboard": ["admin", "menager", "super-admin"],
-};
+const publicRoutes = ["/signin", "/sign-up"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isProtectedRoute = Object.keys(protectedRoutes).some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
-
-  if (!isProtectedRoute) {
+  // Allow public routes
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
-  try {
-    const userinfo: any = await LogedUser();
+  // Get token from cookies
+  const token = request.cookies.get("accessToken")?.value;
+  let userInfo: any = null;
 
-    if (!userinfo) {
-      const loginUrl = new URL("/signin", request.url);
-      loginUrl.searchParams.set("callbackUrl", encodeURI(pathname));
-      return NextResponse.redirect(loginUrl);
-    }
+  if (token) {
+    try {
+      const decoded: any = jwtDecode(token);
 
-    let requiredRole: string[] = [];
-
-    if (pathname === "/profile" || pathname.startsWith("/profile/")) {
-      requiredRole = protectedRoutes["/profile"];
-    } else if (
-      pathname === "/dashboard" ||
-      pathname.startsWith("/dashboard/")
-    ) {
-      requiredRole = protectedRoutes["/dashboard"];
-    }
-
-    if (requiredRole.length > 0 && !requiredRole.includes(userinfo.role)) {
-      if (userinfo.role === "user" && pathname.startsWith("/dashboard")) {
-        return NextResponse.redirect(new URL("/profile", request.url));
+      // ✅ Check if expired
+      if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+        return NextResponse.redirect(new URL("/signin", request.url));
       }
 
-      return NextResponse.redirect(new URL("/home", request.url));
+      userInfo = decoded;
+    } catch (err) {
+      console.log(err);
+      return NextResponse.redirect(new URL("/signin", request.url));
     }
-
-    return NextResponse.next();
-  } catch (error) {
-    console.error("Middleware error:", error);
-    const loginUrl = new URL("/signin", request.url);
-    return NextResponse.redirect(loginUrl);
   }
+
+  // If not logged in → redirect
+  if (!userInfo) {
+    return NextResponse.redirect(new URL("/signin", request.url));
+  }
+
+  // Profile: any logged-in user
+  if (pathname.startsWith("/profile")) {
+    return NextResponse.next();
+  }
+
+  // Dashboard: only admin/manager/super-admin
+  if (pathname.startsWith("/dashboard")) {
+    if (userInfo.role === "user") {
+      return NextResponse.redirect(new URL("/profile", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
