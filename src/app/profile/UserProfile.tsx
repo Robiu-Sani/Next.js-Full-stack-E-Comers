@@ -18,6 +18,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import useContextData from "@/defaults/custom-component/useContextData";
 
 interface UserData {
   _id: string;
@@ -80,6 +81,13 @@ export default function UserProfile() {
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const { UserData } = useContextData();
+  useEffect(() => {
+    if (!UserData) {
+      router.push("/");
+    }
+  }, [UserData, router]);
 
   // Fetch profile data
   const fetchProfileData = async () => {
