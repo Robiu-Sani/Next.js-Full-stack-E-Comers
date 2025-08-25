@@ -52,7 +52,7 @@ export default function Products() {
       </div>
 
       {/* Products Grid */}
-      <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 px-4">
+      <div className="container mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 px-4">
         {loading ? (
           <p className="col-span-full text-center text-gray-500">
             Loading products...
