@@ -1,4 +1,4 @@
-import CouponProducts from "./_home/CouponProducts";
+import CouponProducts from "./_home/featuredProducts";
 import HomeBanner from "./_home/HomeBanner";
 import HomeCategory from "./_home/HomeCategory";
 import HomeOffersProducts from "./_home/HomeOffersProducts";
