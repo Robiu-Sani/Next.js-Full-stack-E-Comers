@@ -9,7 +9,7 @@ export default function AddCart({ className }: { className?: string }) {
     <Button
       variant="outline"
       size="icon"
-      className={`rounded-full shadow-md bg-white hover:bg-green-50 hover:text-green-600 transition-colors ${className}`}
+      className={`rounded-full cursor-pointer shadow-md bg-white hover:bg-green-50 hover:text-green-600 transition-colors ${className}`}
     >
       <ShoppingCart className="w-4 h-4" />
     </Button>

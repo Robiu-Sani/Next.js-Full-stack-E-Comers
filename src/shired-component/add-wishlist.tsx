@@ -9,7 +9,7 @@ export default function AddWishlist({ className }: { className?: string }) {
     <Button
       variant="outline"
       size="icon"
-      className={`rounded-full shadow-md bg-white hover:bg-red-50 hover:text-red-500 transition-colors ${className}`}
+      className={`rounded-full cursor-pointer shadow-md bg-white hover:bg-red-50 hover:text-red-500 transition-colors ${className}`}
     >
       <Heart className="w-4 h-4" />
     </Button>

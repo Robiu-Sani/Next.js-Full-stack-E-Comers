@@ -8,6 +8,7 @@ import AddCart from "./add-cart";
 import AddWishlist from "./add-wishlist";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import AddCompaire from "./add-compaire";
 
 export default function ProductCard({ product }: { product: any }) {
   const router = useRouter();
@@ -16,19 +17,28 @@ export default function ProductCard({ product }: { product: any }) {
   const secondImage =
     product?.images?.length > 1 ? product?.images?.[1] : product?.images?.[0];
 
+  const compaireData = {
+    id: product._id,
+    name: product.name,
+    image: firstImage,
+    image2: secondImage,
+    price: product.generalPrice.currentPrice,
+  };
+
   return (
-    <Card
-      onClick={() => router.push(`/products/product-details/${product._id}`)}
-      className="relative group flex flex-col justify-between cursor-pointer p-0 overflow-hidden border rounded-xl shadow-md hover:shadow-lg transition-all"
-    >
+    <Card className="relative group flex flex-col justify-between cursor-pointer p-0 overflow-hidden border rounded-xl shadow-md hover:shadow-lg transition-all">
       {/* Action Buttons */}
       <div className="absolute top-2 right-2 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <AddWishlist />
         <AddCart />
+        <AddCompaire product={compaireData} />
       </div>
 
       {/* Product Image */}
-      <div className="relative w-full aspect-square overflow-hidden">
+      <div
+        onClick={() => router.push(`/products/product-details/${product._id}`)}
+        className="relative w-full aspect-square overflow-hidden"
+      >
         <Image
           width={300}
           height={300}
@@ -46,7 +56,10 @@ export default function ProductCard({ product }: { product: any }) {
       </div>
 
       {/* Product Info */}
-      <CardContent className="px-3 -mt-4">
+      <CardContent
+        onClick={() => router.push(`/products/product-details/${product._id}`)}
+        className="px-3 -mt-4"
+      >
         <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
         <div className="flex items-center gap-2">
           <span className="text-base font-semibold text-primary">
@@ -72,7 +85,7 @@ export default function ProductCard({ product }: { product: any }) {
             e.stopPropagation();
             router.push(`/products/product-details/${product._id}`);
           }}
-          className="w-full "
+          className="w-full cursor-pointer"
         >
           View Details
         </Button>

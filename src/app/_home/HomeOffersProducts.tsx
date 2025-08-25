@@ -49,16 +49,21 @@ export default function HomeOffersProducts() {
 
   return (
     <section className="w-full ">
-      <div className="container mx-auto rounded-2xl p-6 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 shadow-inner">
+      <div
+        className="container mx-auto rounded-2xl p-6 
+    bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 
+    dark:from-gray-800/70 dark:via-gray-900/60 dark:to-gray-800/70 
+    shadow-inner"
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-            <Tag className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-white">
+            <Tag className="w-4 h-4 text-primary " />
             <span>Special Offers</span>
           </div>
           <Button
             variant="outline"
-            className="rounded-xl text-sm"
+            className=" text-sm"
             onClick={() => router.push("/offers")}
           >
             View All
