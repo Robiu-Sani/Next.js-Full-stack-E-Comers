@@ -1,13 +1,16 @@
-import React from "react";
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Gift, Truck, Headphones, BadgeDollarSign } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function OffersCards() {
+  const router = useRouter();
   const offers = [
     {
       title: "Best Offers",
       description: "Exclusive deals and discounts for our customers",
       icon: <Gift className="h-6 w-6" />,
+      url: "/offers",
       colors: {
         bgFrom: "from-purple-600/10",
         bgTo: "to-blue-600/5",
@@ -24,6 +27,7 @@ export default function OffersCards() {
       title: "Fast Delivery",
       description: "Get your orders delivered in record time",
       icon: <Truck className="h-6 w-6" />,
+      url: "/templates/delivery",
       colors: {
         bgFrom: "from-green-600/10",
         bgTo: "to-emerald-600/5",
@@ -40,6 +44,7 @@ export default function OffersCards() {
       title: "Best Support",
       description: "24/7 customer support for all your needs",
       icon: <Headphones className="h-6 w-6" />,
+      url: "/templates/support",
       colors: {
         bgFrom: "from-orange-600/10",
         bgTo: "to-amber-600/5",
@@ -56,6 +61,7 @@ export default function OffersCards() {
       title: "Trusted Refund",
       description: "Easy and hassle-free refund process",
       icon: <BadgeDollarSign className="h-6 w-6" />,
+      url: "/templates/refund",
       colors: {
         bgFrom: "from-red-600/10",
         bgTo: "to-pink-600/5",
@@ -75,8 +81,9 @@ export default function OffersCards() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {offers.map((offer, index) => (
           <Card
+            onClick={() => router.push(offer.url)}
             key={index}
-            className={`relative h-[100px] overflow-hidden border-0 bg-gradient-to-br ${offer.colors.bgFrom} ${offer.colors.bgTo} ${offer.colors.darkBgFrom} ${offer.colors.darkBgTo} transition-all duration-300 hover:scale-[1.02] hover:shadow-md`}
+            className={`relative h-[100px] cursor-pointer overflow-hidden border-0 bg-gradient-to-br ${offer.colors.bgFrom} ${offer.colors.bgTo} ${offer.colors.darkBgFrom} ${offer.colors.darkBgTo} transition-all duration-300 hover:scale-[1.02] hover:shadow-md`}
           >
             {/* Decorative elements */}
             <div
