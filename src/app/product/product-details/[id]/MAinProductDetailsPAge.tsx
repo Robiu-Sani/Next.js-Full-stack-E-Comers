@@ -187,11 +187,20 @@ export default function MainProductDetailsPage() {
     );
   }
 
+  const compaireData = {
+    id: product._id,
+    name: product.name,
+    image: product.images[0],
+    image2: product.images[1] || product.images[0],
+    price: product.generalPrice.currentPrice,
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ImageParts images={product.images} />
         <ProductIntroduce
+          infoData={compaireData}
           data={{
             quentity: product.quentity,
             offerPercentage: product.offerPercentage,

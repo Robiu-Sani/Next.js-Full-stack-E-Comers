@@ -22,7 +22,7 @@ export default function WishlistListHandle({ products }: { products: any }) {
     setSelectedProducts((prev) => {
       if (prev.includes(productId)) {
         return prev.filter((id) => id !== productId);
-      } else if (prev.length < 2) {
+      } else if (prev.length < 10) {
         return [...prev, productId];
       }
       return prev;
