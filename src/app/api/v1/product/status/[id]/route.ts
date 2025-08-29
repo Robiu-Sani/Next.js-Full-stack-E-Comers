@@ -17,7 +17,9 @@ export async function GET(req: NextRequest, context: ParamsType) {
   try {
     await connectDb();
 
-    const product = await Product.findById(id);
+    const product = await Product.findById(id)
+      .populate("category")
+      .populate("subcategory");
 
     if (!product || product.isDeleted) {
       return NextResponse.json(
