@@ -7,19 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingCart } from "lucide-react";
 import ListProductCard from "../shaire-component/ListProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
-import useContextData from "@/defaults/custom-component/useContextData";
-import { toast } from "sonner";
-
-interface CartProduct {
-  product: any;
-  expiresAt: number;
-  quantity: number;
-}
 
 export default function WishlistListHandle({ products }: { products: any }) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isMounted, setIsMounted] = useState(false);
-  const { handleAddCart } = useContextData();
 
   useEffect(() => {
     setIsMounted(true);
@@ -34,57 +25,6 @@ export default function WishlistListHandle({ products }: { products: any }) {
       }
       return prev;
     });
-  };
-
-  const handleAddCartData = () => {
-    if (selectedProducts.length === 0) {
-      toast.error("Please select at least one product to add to cart");
-      return;
-    }
-
-    const getSelectProducts = products.filter((product: any) =>
-      selectedProducts.includes(product.id)
-    );
-
-    const existing = localStorage.getItem("cartProducts");
-    const cartProducts: CartProduct[] = existing ? JSON.parse(existing) : [];
-    const now = Date.now();
-
-    // Filter out expired products
-    const validProducts = cartProducts.filter((item) => item.expiresAt > now);
-
-    let addedCount = 0;
-
-    // Add each selected product to cart
-    getSelectProducts.forEach((product: any) => {
-      const existingProductIndex = validProducts.findIndex(
-        (item) => item.product.id === product.id
-      );
-
-      if (existingProductIndex !== -1) {
-        // Product already in cart, increase quantity
-        validProducts[existingProductIndex].quantity += 1;
-      } else {
-        // Add new product to cart
-        const newProduct: CartProduct = {
-          product: product,
-          expiresAt: now + 30 * 24 * 60 * 60 * 1000, // 30 days from now
-          quantity: 1,
-        };
-        validProducts.push(newProduct);
-      }
-      addedCount++;
-    });
-
-    // Save updated cart to localStorage
-    localStorage.setItem("cartProducts", JSON.stringify(validProducts));
-    handleAddCart(validProducts);
-
-    if (addedCount === 1) {
-      toast.success("Product added to cart successfully!");
-    } else {
-      toast.success(`${addedCount} products added to cart successfully!`);
-    }
   };
 
   if (!isMounted) {
@@ -163,15 +103,9 @@ export default function WishlistListHandle({ products }: { products: any }) {
             <Button variant="outline" className="flex-1">
               Share Wishlist
             </Button>
-            <Button
-              className="flex-1"
-              onClick={handleAddCartData}
-              disabled={selectedProducts.length === 0}
-            >
+            <Button className="flex-1">
               <ShoppingCart className="h-4 w-4 mr-2" />
-              {selectedProducts.length > 0
-                ? `Add ${selectedProducts.length} to Cart`
-                : "Add to Cart"}
+              Checkout
             </Button>
           </div>
         </div>
