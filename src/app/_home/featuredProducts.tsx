@@ -141,7 +141,7 @@ export default function FeaturedProducts() {
                 {currentProducts.map((product) => (
                   <div
                     onClick={() =>
-                      router.push(`/products/product-details/${product._id}`)
+                      router.push(`/product/product-details/${product._id}`)
                     }
                     key={product._id}
                     className="transform transition-all duration-300 hover:-translate-y-1"

@@ -36,7 +36,7 @@ export default function ProductCard({ product }: { product: any }) {
 
       {/* Product Image */}
       <div
-        onClick={() => router.push(`/products/product-details/${product._id}`)}
+        onClick={() => router.push(`/product/product-details/${product._id}`)}
         className="relative w-full aspect-square overflow-hidden"
       >
         <Image
@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: any }) {
 
       {/* Product Info */}
       <CardContent
-        onClick={() => router.push(`/products/product-details/${product._id}`)}
+        onClick={() => router.push(`/product/product-details/${product._id}`)}
         className="px-3 -mt-4"
       >
         <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
@@ -83,7 +83,7 @@ export default function ProductCard({ product }: { product: any }) {
         <Button
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/products/product-details/${product._id}`);
+            router.push(`/product/product-details/${product._id}`);
           }}
           className="w-full cursor-pointer"
         >
