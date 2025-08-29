@@ -4,13 +4,15 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import ListProductCard from "../shaire-component/ListProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
+import useContextData from "@/defaults/custom-component/useContextData";
 
 export default function WishlistListHandle({ products }: { products: any }) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const { removeWishList } = useContextData();
 
   useEffect(() => {
     setIsMounted(true);
@@ -77,7 +79,7 @@ export default function WishlistListHandle({ products }: { products: any }) {
               onClick={() => handleSelectProduct(product.id)}
             >
               <CardContent className="p-4">
-                <div className="flex items-start gap-4">
+                <div className="flex relative items-start gap-4">
                   <Checkbox
                     checked={selectedProducts.includes(product.id)}
                     onCheckedChange={() => handleSelectProduct(product.id)}
@@ -86,8 +88,14 @@ export default function WishlistListHandle({ products }: { products: any }) {
                       selectedProducts.length === 2 &&
                       !selectedProducts.includes(product.id)
                     }
-                    className="mt-1"
+                    className="mt-1 "
                   />
+                  <div
+                    onClick={() => removeWishList(product.id)}
+                    className="p-2 cursor-pointer absolute top-[-8px] right-[-8px] rounded-md bg-gray-50 text-red-600 hover:bg-gray-100 dark:bg-gray-800 hover:dark:bg-gray-900"
+                  >
+                    <Trash2 size={14} />
+                  </div>
                   <ListProductCard product={product} />
                 </div>
               </CardContent>

@@ -23,6 +23,9 @@ export default function useContextData() {
     handleAddWishlist,
     cartData,
     handleAddCart,
+    removeCartItem,
+    removeWishList,
+    removeCompaire,
   } = context;
   return {
     test,
@@ -38,5 +41,8 @@ export default function useContextData() {
     handleAddWishlist,
     cartData,
     handleAddCart,
+    removeCartItem,
+    removeWishList,
+    removeCompaire,
   };
 }

@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import ListProductCard from "../shaire-component/ListProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2 } from "lucide-react";
+import useContextData from "@/defaults/custom-component/useContextData";
 
 interface Product {
   id: string;
@@ -18,6 +20,7 @@ interface Product {
 
 export default function CartListHandle({ products }: { products: Product[] }) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const { removeCartItem } = useContextData();
 
   const handleSelectProduct = (productId: string) => {
     setSelectedProducts((prev) => {
@@ -38,15 +41,6 @@ export default function CartListHandle({ products }: { products: Product[] }) {
       setSelectedProducts(products.map((item) => item.id));
     }
   };
-
-  // const handleRemoveProduct = (productId: string) => {
-  //   const updatedCart = cartItems.filter(
-  //     (item) => item.product.id !== productId
-  //   );
-  //   setCartItems(updatedCart);
-  //   setSelectedProducts((prev) => prev.filter((id) => id !== productId));
-  //   localStorage.setItem("cartProducts", JSON.stringify(updatedCart));
-  // };
 
   const calculateTotal = () => {
     return selectedProducts.reduce((total, productId) => {
@@ -99,13 +93,19 @@ export default function CartListHandle({ products }: { products: Product[] }) {
               onClick={() => handleSelectProduct(product.id)}
             >
               <CardContent className="p-4">
-                <div className="flex items-start gap-4">
+                <div className="flex relative items-start gap-4">
                   <Checkbox
                     checked={selectedProducts.includes(product.id)}
                     onCheckedChange={() => handleSelectProduct(product.id)}
                     onClick={(e) => e.stopPropagation()}
                     className="mt-1"
                   />
+                  <div
+                    onClick={() => removeCartItem(product.id)}
+                    className="p-2 cursor-pointer absolute top-[-8px] right-[-8px] rounded-md bg-gray-50 text-red-600 hover:bg-gray-100 dark:bg-gray-800 hover:dark:bg-gray-900"
+                  >
+                    <Trash2 size={14} />
+                  </div>
                   <ListProductCard product={product} />
                 </div>
               </CardContent>

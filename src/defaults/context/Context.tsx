@@ -3,6 +3,7 @@
 
 import { createContext, useState, ReactNode, useEffect } from "react";
 import LogedUser from "../functions/LogedUser";
+import { toast } from "sonner";
 
 type ContextValue = {
   test: string;
@@ -18,6 +19,9 @@ type ContextValue = {
   handleAddWishlist: (product: any) => void;
   cartData: CartProduct[];
   handleAddCart: (product: any) => void;
+  removeCartItem: (product: any) => void;
+  removeWishList: (product: any) => void;
+  removeCompaire: (product: any) => void;
 };
 
 export const ContextData = createContext<ContextValue | undefined>(undefined);
@@ -130,6 +134,33 @@ export default function Context({ children }: ContextProviderProps) {
     }
   }, []);
 
+  const removeCartItem = (productId: string) => {
+    const currentData = cartData.filter(
+      (item) => item.product.id !== productId
+    );
+    setCartData(currentData);
+    localStorage.setItem("cartProducts", JSON.stringify(currentData));
+    toast.success("Product removed from cart!");
+  };
+
+  const removeWishList = (productId: string) => {
+    const currentData = wishlistData.filter(
+      (item) => item.product.id !== productId
+    );
+    setWishlistData(currentData);
+    localStorage.setItem("WishlistProducts", JSON.stringify(currentData));
+    toast.success("Product removed from Wishlist!");
+  };
+
+  const removeCompaire = (productId: string) => {
+    const currentData = compareData.filter(
+      (item) => item.product.id !== productId
+    );
+    setCompareData(currentData);
+    localStorage.setItem("compareProducts", JSON.stringify(currentData));
+    toast.success("Product removed from Compaire!");
+  };
+
   // Compare functions
   const handleAddCompare = (product: any) => {
     setCompareData(product);
@@ -167,6 +198,9 @@ export default function Context({ children }: ContextProviderProps) {
     handleAddWishlist,
     cartData,
     handleAddCart,
+    removeCartItem,
+    removeWishList,
+    removeCompaire,
   };
 
   return <ContextData.Provider value={value}>{children}</ContextData.Provider>;
