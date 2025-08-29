@@ -9,6 +9,7 @@ import WishList from "./WishList";
 import CartList from "./CartList";
 import SearchBar from "./SearchBar";
 import useContextData from "../custom-component/useContextData";
+import CpmpaireList from "./CpmpaireList";
 
 export default function NavTopSection() {
   const { UserData } = useContextData();
@@ -33,7 +34,7 @@ export default function NavTopSection() {
         </div>
 
         {/* Right Icons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-0">
           <div className="block md:hidden">
             <SearchBar />
           </div>
@@ -43,6 +44,9 @@ export default function NavTopSection() {
 
           {/* Cart Sheet */}
           <CartList />
+
+          {/* compaire sheet  */}
+          <CpmpaireList />
 
           {/* Theme Toggle */}
           <ModeToggle />

@@ -29,8 +29,8 @@ export default function ProductCard({ product }: { product: any }) {
     <Card className="relative group flex flex-col justify-between cursor-pointer p-0 overflow-hidden border rounded-xl shadow-md hover:shadow-lg transition-all">
       {/* Action Buttons */}
       <div className="absolute top-2 right-2 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-        <AddWishlist />
-        <AddCart />
+        <AddWishlist product={compaireData} />
+        <AddCart product={compaireData} />
         <AddCompaire product={compaireData} />
       </div>
 

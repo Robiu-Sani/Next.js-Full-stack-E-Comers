@@ -84,11 +84,11 @@ export default function HomeCategory() {
               onClick={() => handleCardClick(category._id)}
             >
               <Card className="overflow-hidden p-0 rounded-xl shadow-lg relative h-[140px]">
-                <CardContent className="p-0 relative h-full">
+                <CardContent className="p-0 relative w-full h-full">
                   <Image
                     src={category.image}
                     alt={category.name}
-                    fill
+                    fill={true}
                     className="object-cover w-full h-full"
                   />
 
