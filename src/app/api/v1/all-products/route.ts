@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get("sort") || "createdAt";
     const sortOrder = searchParams.get("order") === "asc" ? 1 : -1;
     const minPrice = parseFloat(searchParams.get("minPrice") || "0");
-    const maxPrice = parseFloat(searchParams.get("maxPrice") || "999999");
+    const maxPrice = parseFloat(searchParams.get("maxPrice") || "9999999999");
     const brand = searchParams.get("brand") || "";
 
     // Calculate skip value for pagination
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Add price range filter
-    if (minPrice > 0 || maxPrice < 999999) {
+    if (minPrice > 0 || maxPrice < 999999999) {
       searchQuery["generalPrice.currentPrice"] = {
         $gte: minPrice,
         $lte: maxPrice,

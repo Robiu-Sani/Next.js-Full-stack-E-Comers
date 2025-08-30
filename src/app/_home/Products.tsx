@@ -5,6 +5,8 @@ import ProductCard from "@/shired-component/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Product {
   _id: string;
@@ -41,6 +43,17 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  const ProductSkeleton = () => (
+    <Card className="h-full p-0 overflow-hidden">
+      <Skeleton className="h-48 w-full rounded-t-lg" />
+      <CardContent className="p-4">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-4" />
+        <Skeleton className="h-6 w-1/3" />
+      </CardContent>
+    </Card>
+  );
+
   return (
     <section className="w-full py-6">
       {/* Header */}
@@ -54,9 +67,9 @@ export default function Products() {
       {/* Products Grid */}
       <div className="container mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 px-4">
         {loading ? (
-          <p className="col-span-full text-center text-gray-500">
-            Loading products...
-          </p>
+          Array.from({ length: 12 }).map((_, index) => (
+            <ProductSkeleton key={index} />
+          ))
         ) : products.length > 0 ? (
           products.map((product) => (
             <ProductCard key={product._id} product={product} />
