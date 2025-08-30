@@ -1,5 +1,10 @@
 import React from "react";
+import MenageOfferProducts from "./MenageOfferProducts";
 
 export default function AllOffersProduct() {
-  return <div>AllOffersProduct</div>;
+  return (
+    <div>
+      <MenageOfferProducts />
+    </div>
+  );
 }
