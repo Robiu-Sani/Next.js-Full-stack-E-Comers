@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Tag } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Product {
   _id: string;
@@ -46,6 +48,17 @@ export default function HomeOffersProducts() {
     };
     fetchProducts();
   }, []);
+
+  const ProductSkeleton = () => (
+    <Card className="h-full p-0 overflow-hidden">
+      <Skeleton className="h-48 w-full rounded-t-lg" />
+      <CardContent className="p-4">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-4" />
+        <Skeleton className="h-6 w-1/3" />
+      </CardContent>
+    </Card>
+  );
 
   return (
     <section className="w-full ">
@@ -96,7 +109,11 @@ export default function HomeOffersProducts() {
               ))
             ) : (
               <p className="text-center text-gray-500 py-10 w-full">
-                No offer products available.
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <CarouselItem key={index}>
+                    <ProductSkeleton />
+                  </CarouselItem>
+                ))}
               </p>
             )}
           </CarouselContent>
