@@ -110,7 +110,10 @@ export default function HomeOffersProducts() {
             ) : (
               <p className="text-center text-gray-500 py-10 w-full">
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem
+                    key={index}
+                    className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6"
+                  >
                     <ProductSkeleton />
                   </CarouselItem>
                 ))}
