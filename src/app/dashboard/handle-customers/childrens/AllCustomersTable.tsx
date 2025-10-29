@@ -276,8 +276,8 @@ export default function AllCustomersTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getRoleVariant(customer.user.role)}>
-                      {customer.user.role}
+                    <Badge variant={getRoleVariant(customer.user?.role)}>
+                      {customer.user?.role}
                     </Badge>
                   </TableCell>
                   <TableCell>

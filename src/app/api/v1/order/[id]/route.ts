@@ -4,16 +4,16 @@ import OrderModel from "@/models/order.model";
 import { NextRequest, NextResponse } from "next/server";
 
 type ParamsType = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 /**
  * 🟢 GET: Get single order by ID
  */
-export async function GET(req: NextRequest, { params }: ParamsType) {
-  const { id } = params;
+export async function GET(req: NextRequest, context: ParamsType) {
+  const { id } = await context.params;
 
   try {
     await connectDb();
@@ -46,8 +46,8 @@ export async function GET(req: NextRequest, { params }: ParamsType) {
 /**
  * 🟡 PATCH: Update order by ID
  */
-export async function PATCH(req: NextRequest, { params }: ParamsType) {
-  const { id } = params;
+export async function PATCH(req: NextRequest,  context: ParamsType) {
+  const { id } = await context.params;
 
   try {
     await connectDb();
@@ -89,8 +89,8 @@ export async function PATCH(req: NextRequest, { params }: ParamsType) {
 /**
  * 🔴 DELETE: Soft delete or restore order by ID
  */
-export async function DELETE(req: NextRequest, { params }: ParamsType) {
-  const { id } = params;
+export async function DELETE(req: NextRequest,  context: ParamsType) {
+  const { id } = await context.params;
 
   try {
     await connectDb();
