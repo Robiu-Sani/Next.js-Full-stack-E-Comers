@@ -1,39 +1,25 @@
-import { ObjectId } from "mongoose";
-
 export interface IOrder {
-  user?: ObjectId;
-  products: ObjectId[];
-  address: {
-    addressName: string;
-    district: string;
-    city: string;
-    thana?: string;
-    addressLine: string;
-    phoneNumber: string;
-  };
-  paymentMethod: "cash-on-delevery" | "online-payment" | "bank-transfer";
-  paymentStatus?: "pending" | "paid" | "failed" | "refunded";
-  transactionId?: string;
-  paymentDate?: Date;
-  deliveryMethod: "steadFast" | "pathao" | "Paperfly" | "eCourier";
-  deliveryCharge: number;
-  deliveryStatus:
+  orderId: string; // Auto-generated unique order ID (e.g., ORD-20251028-XYZ)
+  name: string; // Customer name
+  number: string; // Customer phone number
+  address: string; // Shipping address as string
+  products: string[]; // Array of product ObjectIds (as strings)
+  totalAmount: number; // Total price
+  deliveryCharge: number; // Delivery cost
+  discount?: number; // Optional discount
+  grandTotal: number; // totalAmount + deliveryCharge - discount
+  paymentMethod: "cash-on-delivery" | "bkash" | "nagad" | "rocket" | "card";
+  paymentStatus: "pending" | "paid" | "failed" | "refunded";
+  orderStatus:
     | "pending"
+    | "confirmed"
     | "processing"
     | "shipped"
-    | "in-transit"
     | "delivered"
-    | "cancelled"
-    | "returned";
-  trackingId?: string;
-  expectedDeliveryDate?: Date;
-  deliveredAt?: Date;
-  subtotal: number;
-  total: number;
-  discount?: number;
-  couponCode?: string;
-  isCancelled?: boolean;
-  cancellationReason?: string;
-  notes?: string;
-  isDeleted?: boolean;
+    | "cancelled";
+  trackingId?: string; // Courier tracking number
+  note?: string; // Optional order note
+  isDelivered: boolean;
+  isPaid: boolean;
+  isDeleted:boolean;
 }

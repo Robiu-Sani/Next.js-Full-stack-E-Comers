@@ -26,6 +26,8 @@ export default function useContextData() {
     removeCartItem,
     removeWishList,
     removeCompaire,
+    handlePurchasedData,
+    purchasesData
   } = context;
   return {
     test,
@@ -44,5 +46,7 @@ export default function useContextData() {
     removeCartItem,
     removeWishList,
     removeCompaire,
+    handlePurchasedData,
+    purchasesData
   };
 }

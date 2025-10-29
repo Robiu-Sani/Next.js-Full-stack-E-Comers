@@ -9,6 +9,8 @@ import ListProductCard from "../shaire-component/ListProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2 } from "lucide-react";
 import useContextData from "@/defaults/custom-component/useContextData";
+// import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -18,9 +20,10 @@ interface Product {
   price: number;
 }
 
-export default function CartListHandle({ products }: { products: Product[] }) {
+export default function CartListHandle({ products , closeSheet}: { products: Product[] , closeSheet:any}) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const { removeCartItem } = useContextData();
+  const { removeCartItem , handlePurchasedData } = useContextData();
+  const router = useRouter()
 
   const handleSelectProduct = (productId: string) => {
     setSelectedProducts((prev) => {
@@ -49,11 +52,20 @@ export default function CartListHandle({ products }: { products: Product[] }) {
     }, 0);
   };
 
-  const handleCheckout = () => {
-    if (selectedProducts.length > 0) {
-      console.log("Processing order for products:", selectedProducts);
-      // Add your checkout logic here
-    }
+  // const handleCheckout = () => {
+  //   if (selectedProducts.length > 0) {
+  //     console.log("Processing order for products:", selectedProducts);
+  //     // Add your checkout logic here
+  //   }
+  // };
+
+  const handleBuyData = () => {
+    const selectedProductData = products.filter((p) =>
+      selectedProducts.includes(p.id)
+    );
+    handlePurchasedData(selectedProductData);
+    closeSheet()
+    router.push("/buy-product");
   };
 
   return (
@@ -129,9 +141,10 @@ export default function CartListHandle({ products }: { products: Product[] }) {
               {selectedProducts.length !== 1 ? "s" : ""} selected
             </p>
           </div>
-          <Button className="w-full" size="lg" onClick={handleCheckout}>
+          <Button onClick={handleBuyData} className="w-full" size="lg" >
             Proceed to Checkout
           </Button>
+          
         </div>
       )}
     </div>

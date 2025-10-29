@@ -13,6 +13,7 @@ type ContextValue = {
   error: string | null;
   UserData: any;
   handleUser: any;
+  purchasesData: any;
   compareData: CompareProduct[];
   handleAddCompare: (product: any) => void;
   wishlistData: WishlistProduct[];
@@ -22,6 +23,7 @@ type ContextValue = {
   removeCartItem: (product: any) => void;
   removeWishList: (product: any) => void;
   removeCompaire: (product: any) => void;
+  handlePurchasedData: (product: any) => void;
 };
 
 export const ContextData = createContext<ContextValue | undefined>(undefined);
@@ -64,6 +66,7 @@ export default function Context({ children }: ContextProviderProps) {
   const [compareData, setCompareData] = useState<CompareProduct[]>([]);
   const [wishlistData, setWishlistData] = useState<WishlistProduct[]>([]);
   const [cartData, setCartData] = useState<CartProduct[]>([]);
+  const [purchasesData , setPurchasesData] = useState<CartProduct[]>([])
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -134,6 +137,14 @@ export default function Context({ children }: ContextProviderProps) {
     }
   }, []);
 
+ const handlePurchasedData = (data:any) => {
+    if (Array.isArray(data)) {
+        setPurchasesData(prev => [...prev, ...data]) // Merge arrays
+    } else {
+        setPurchasesData(prev => [...prev, data]) // Add single item
+    }
+}
+
   const removeCartItem = (productId: string) => {
     const currentData = cartData.filter(
       (item) => item.product.id !== productId
@@ -201,6 +212,8 @@ export default function Context({ children }: ContextProviderProps) {
     removeCartItem,
     removeWishList,
     removeCompaire,
+    handlePurchasedData,
+    purchasesData
   };
 
   return <ContextData.Provider value={value}>{children}</ContextData.Provider>;

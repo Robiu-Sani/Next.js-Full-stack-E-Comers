@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,8 +15,10 @@ import CartListHandle from "./childrens/CartListHandle";
 export default function CartList() {
   const { cartData } = useContextData();
   const products = cartData.map((item) => item.product);
+  const [open, setOpen] = useState(false); // 👈 control sheet open/close
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <ShoppingCart className="w-5 h-5" />
@@ -26,11 +29,13 @@ export default function CartList() {
           )}
         </Button>
       </SheetTrigger>
+
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Your Cart</SheetTitle>
           <SheetDescription></SheetDescription>
-          <CartListHandle products={products} />
+          {/* 👇 Pass close handler to CartListHandle */}
+          <CartListHandle products={products} closeSheet={() => setOpen(false)} />
         </SheetHeader>
       </SheetContent>
     </Sheet>

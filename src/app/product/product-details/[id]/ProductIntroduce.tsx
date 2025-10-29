@@ -28,12 +28,14 @@ interface ProductIntroduceProps {
   };
 }
 
-export default function ProductIntroduce({
+export default function ProductIntroduce({handleBuyData,
   data,
   infoData,
 }: {
+  handleBuyData : any
   data: ProductIntroduceProps["data"];
   infoData: any;
+
 }) {
   const { name, offerPercentage, generalPrice, priceVariants, details } = data;
 
@@ -97,11 +99,11 @@ export default function ProductIntroduce({
 
           {priceVariants.length > 1 && lowestPriceVariant && (
             <p className="text-sm text-muted-foreground">
-              From ${lowestPriceVariant.salePrice.toFixed(2)}
+              From BTD{lowestPriceVariant.salePrice.toFixed(2)}
               {lowestPriceVariant.regularPrice >
                 lowestPriceVariant.salePrice && (
                 <span className="line-through ml-1">
-                  ${lowestPriceVariant.regularPrice.toFixed(2)}
+                  BTD{lowestPriceVariant.regularPrice.toFixed(2)}
                 </span>
               )}
             </p>
@@ -139,11 +141,11 @@ export default function ProductIntroduce({
                         </div>
                         <div className="text-right">
                           <p className="font-bold">
-                            ${variant.salePrice.toFixed(2)}
+                            BTD{variant.salePrice.toFixed(2)}
                           </p>
                           {variant.regularPrice > variant.salePrice && (
                             <p className="text-sm text-muted-foreground line-through">
-                              ${variant.regularPrice.toFixed(2)}
+                              BTD{variant.regularPrice.toFixed(2)}
                             </p>
                           )}
                         </div>
@@ -156,7 +158,7 @@ export default function ProductIntroduce({
           </>
         )}
 
-        <ActionsButtonComponent product={infoData} />
+        <ActionsButtonComponent product={infoData} handleBuyData={handleBuyData} />
       </CardContent>
     </Card>
   );

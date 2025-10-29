@@ -93,6 +93,19 @@ export const data = {
       ],
     },
     {
+      title: "Manage Order",
+      url: "#",
+      icon: FolderClosed,
+      isActive: true,
+      items: [
+        {
+          title: "All Orders",
+          url: "/dashboard/orders",
+        },
+       
+      ],
+    },
+    {
       title: "Handle Users",
       url: "#",
       icon: Bot,

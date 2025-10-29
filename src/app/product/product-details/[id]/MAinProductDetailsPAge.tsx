@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ImageParts from "./ImageParts";
 import ProductIntroduce from "./ProductIntroduce";
 import BasicInfo from "./BasicInfo";
+import useContextData from "@/defaults/custom-component/useContextData";
 
 interface GeneralPrice {
   currentPrice: number;
@@ -126,6 +127,8 @@ export default function MainProductDetailsPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const {handlePurchasedData} = useContextData()
+  const router = useRouter()
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -156,6 +159,8 @@ export default function MainProductDetailsPage() {
 
     fetchProduct();
   }, [id]);
+
+  
 
   if (loading) {
     return (
@@ -195,11 +200,17 @@ export default function MainProductDetailsPage() {
     price: product.generalPrice.currentPrice,
   };
 
+  const handleBuyData = () => {
+    handlePurchasedData(compaireData)
+    router.push('/buy-product')
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ImageParts images={product.images} />
         <ProductIntroduce
+        handleBuyData={handleBuyData}
           infoData={compaireData}
           data={{
             quentity: product.quentity,

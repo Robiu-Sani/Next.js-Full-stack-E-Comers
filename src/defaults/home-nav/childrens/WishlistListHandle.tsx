@@ -8,11 +8,14 @@ import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import ListProductCard from "../shaire-component/ListProductCard";
 import { Checkbox } from "@/components/ui/checkbox";
 import useContextData from "@/defaults/custom-component/useContextData";
+// import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function WishlistListHandle({ products }: { products: any }) {
+export default function WishlistListHandle({ products , closeSheet }: { products: any , closeSheet:any }) {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isMounted, setIsMounted] = useState(false);
-  const { removeWishList } = useContextData();
+  const { removeWishList , handlePurchasedData } = useContextData();
+  const router = useRouter()
 
   useEffect(() => {
     setIsMounted(true);
@@ -45,6 +48,15 @@ export default function WishlistListHandle({ products }: { products: any }) {
       </div>
     );
   }
+
+    const handleBuyData = () => {
+    const selectedProductData = products.filter((p:any) =>
+      selectedProducts.includes(p.id)
+    );
+    handlePurchasedData(selectedProductData);
+    closeSheet()
+    router.push("/buy-product");
+  };
 
   return (
     <div className="flex flex-col p-2 h-full gap-2">
@@ -105,13 +117,13 @@ export default function WishlistListHandle({ products }: { products: any }) {
       </div>
 
       {/* Action buttons - fixed at bottom */}
-      {products.length > 0 && (
+      {selectedProducts.length > 0 && (
         <div className="sticky bottom-0 bg-background pt-4 border-t">
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1">
+            {/* <Button variant="outline" className="flex-1">
               Share Wishlist
-            </Button>
-            <Button className="flex-1">
+            </Button> */}
+           <Button onClick={handleBuyData} className="flex-1">
               <ShoppingCart className="h-4 w-4 mr-2" />
               Checkout
             </Button>

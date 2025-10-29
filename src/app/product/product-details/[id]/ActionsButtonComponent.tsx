@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart, Zap, Check, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 
-export default function ActionsButtonComponent({ product }: { product: any }) {
+export default function ActionsButtonComponent({ product , handleBuyData }: { product: any , handleBuyData:any }) {
   const { handleAddCart, handleAddWishlist } = useContextData();
   const [quantity, setQuantity] = useState(1);
   const [isInCart, setIsInCart] = useState(false);
@@ -123,10 +123,6 @@ export default function ActionsButtonComponent({ product }: { product: any }) {
     );
   };
 
-  const handleBuyNow = () => {
-    handleAddCartData();
-    toast.success("Redirecting to checkout...");
-  };
 
   const incrementQuantity = () => {
     setQuantity((prev) => prev + 1);
@@ -174,7 +170,7 @@ export default function ActionsButtonComponent({ product }: { product: any }) {
       {/* Action Buttons */}
       <div className="space-x-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Buy Now Button */}
-        <Button onClick={handleBuyNow} className="w-full  ">
+        <Button onClick={handleBuyData} className="w-full  ">
           <Zap className="mr-2 h-5 w-5" />
           Buy Now
         </Button>
