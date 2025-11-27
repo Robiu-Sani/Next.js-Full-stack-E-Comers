@@ -160,7 +160,7 @@ export const EmailTemplates = {
   sendWelcomeEmail: async (to: string, userName: string) => {
     return sendEmail({
       to,
-      subject: "Welcome to Madrasah Association!",
+      subject: "Welcome to Online Store",
       template: "welcome",
       templateData: {
         userName,

@@ -137,11 +137,14 @@ export default function Context({ children }: ContextProviderProps) {
     }
   }, []);
 
- const handlePurchasedData = (data:any) => {
+ const handlePurchasedData = (data: any) => {
+    console.log('handlePurchasedData called with:', data)
     if (Array.isArray(data)) {
-        setPurchasesData(prev => [...prev, ...data]) // Merge arrays
+        setPurchasesData(data) // ✅ REPLACE the entire array
+    } else if (data) {
+        setPurchasesData([data]) // ✅ REPLACE with single item array
     } else {
-        setPurchasesData(prev => [...prev, data]) // Add single item
+        setPurchasesData([]) // ✅ Clear if null/undefined
     }
 }
 
