@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useState, ReactNode, useEffect } from "react";
-import LogedUser from "../functions/LogedUser";
+// import LogedUser from "../functions/LogedUser";
 import { toast } from "sonner";
 
 type ContextValue = {
@@ -89,8 +89,9 @@ export default function Context({ children }: ContextProviderProps) {
         }
 
         // Fetch user data
-        const userinfo: any = await LogedUser();
-        setUserData(userinfo);
+        const userRes = await fetch("/api/v1/me");
+const userJson = await userRes.json();
+setUserData(userJson.user);
       } catch (err) {
         console.error("Failed to fetch data:", err);
         setError(

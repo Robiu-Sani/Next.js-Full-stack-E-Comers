@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -62,10 +63,15 @@ import {
   Printer, 
   Package, 
   Filter,
-  Download
+  Download,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Loader2
 } from 'lucide-react'
 import { toast } from "sonner"
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface Product {
   _id: string
@@ -132,6 +138,20 @@ interface EditOrderForm {
   isPaid: boolean
 }
 
+interface SteadfastResponse {
+  success: boolean
+  message: string
+  data?: {
+    order: Order
+    steadfast: {
+      consignment_id: number
+      invoice: string
+      tracking_code: string
+      status: string
+    }
+  }
+}
+
 export default function AllOrderData() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -140,14 +160,18 @@ export default function AllOrderData() {
   const [paymentStatus, setPaymentStatus] = useState<string>('')
   const [paymentMethod, setPaymentMethod] = useState<string>('')
   const [page, setPage] = useState(1)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [limit, setLimit] = useState(30)
+  const [limit, setLimit] = useState(50)
   
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([])
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [printDialogOpen, setPrintDialogOpen] = useState(false)
+  const [steadfastDialogOpen, setSteadfastDialogOpen] = useState(false)
+  const [bulkSteadfastDialogOpen, setBulkSteadfastDialogOpen] = useState(false)
+  const [creatingSteadfast, setCreatingSteadfast] = useState(false)
+  const [creatingBulkSteadfast, setCreatingBulkSteadfast] = useState(false)
   
   const [editForm, setEditForm] = useState<EditOrderForm>({
     name: '',
@@ -194,31 +218,14 @@ export default function AllOrderData() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, limit, search, orderStatus, paymentStatus, paymentMethod])
 
-  const handleViewOrder = (order: Order) => {
-    setSelectedOrder(order)
-    setViewDialogOpen(true)
-  }
 
-  const handleEditOrder = (order: Order) => {
-    setSelectedOrder(order)
-    setEditForm({
-      name: order.name,
-      number: order.number,
-      address: order.address,
-      paymentStatus: order.paymentStatus,
-      orderStatus: order.orderStatus,
-      isDelivered: order.isDelivered,
-      isPaid: order.isPaid
-    })
-    setEditDialogOpen(true)
-  }
-
+  
   const handleUpdateOrder = async () => {
     if (!selectedOrder) return
 
     try {
       const response = await fetch(`/api/v1/order/${selectedOrder._id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -262,6 +269,97 @@ export default function AllOrderData() {
   const handlePrintOrder = (order: Order) => {
     setSelectedOrder(order)
     setPrintDialogOpen(true)
+  }
+
+  const handleCreateSteadfastOrder = async (order: Order) => {
+    setSelectedOrder(order)
+    setCreatingSteadfast(true)
+    
+    try {
+      const response = await fetch('/api/v1/steadfast-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: order._id
+        }),
+      })
+
+      const result: SteadfastResponse = await response.json()
+
+      if (result.success) {
+        toast.success('Order created successfully in Steadfast')
+        setSteadfastDialogOpen(true)
+        fetchOrders() // Refresh to get updated tracking info
+      } else {
+        toast.error(result.message || 'Failed to create Steadfast order')
+      }
+    } catch (error) {
+      toast.error('Error creating Steadfast order')
+      console.error('Error creating Steadfast order:', error)
+    } finally {
+      setCreatingSteadfast(false)
+    }
+  }
+
+  const handleBulkCreateSteadfastOrders = async () => {
+    if (selectedOrders.length === 0) {
+      toast.error('Please select orders to create in Steadfast')
+      return
+    }
+
+    setCreatingBulkSteadfast(true)
+    
+    try {
+      const response = await fetch('/api/v1/steadfast-order/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderIds: selectedOrders
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success(`Bulk order processed. ${result.data.successful} successful, ${result.data.failed} failed.`)
+        setBulkSteadfastDialogOpen(false)
+        setSelectedOrders([])
+        fetchOrders() // Refresh to get updated tracking info
+        
+        // Show detailed results
+        if (result.data.failed > 0) {
+          toast.error(`${result.data.failed} orders failed to process. Check console for details.`)
+          console.log('Bulk order details:', result.data.details)
+        }
+      } else {
+        toast.error(result.message || 'Failed to create bulk Steadfast orders')
+      }
+    } catch (error) {
+      toast.error('Error creating bulk Steadfast orders')
+      console.error('Error creating bulk Steadfast orders:', error)
+    } finally {
+      setCreatingBulkSteadfast(false)
+    }
+  }
+
+  const toggleOrderSelection = (orderId: string) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    )
+  }
+
+  const selectAllOrders = () => {
+    if (selectedOrders.length === orders.length) {
+      setSelectedOrders([])
+    } else {
+      setSelectedOrders(orders.map(order => order._id))
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -329,10 +427,21 @@ export default function AllOrderData() {
             Manage and track all customer orders
           </p>
         </div>
-        <Button onClick={fetchOrders} variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={fetchOrders} variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Refresh
+          </Button>
+          {selectedOrders.length > 0 && (
+            <Button 
+              onClick={() => setBulkSteadfastDialogOpen(true)}
+              className="gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <Truck className="h-4 w-4" />
+              Create Steadfast ({selectedOrders.length})
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -416,15 +525,35 @@ export default function AllOrderData() {
       {/* Orders Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Orders</CardTitle>
-          <CardDescription>
-            {orders.length} orders found
-          </CardDescription>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle>All Orders</CardTitle>
+              <CardDescription>
+                {orders.length} orders found
+              </CardDescription>
+            </div>
+            {orders.length > 0 && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedOrders.length === orders.length && orders.length > 0}
+                  onChange={selectAllOrders}
+                  className="rounded border-gray-300"
+                />
+                <Label className="text-sm">
+                  Select all ({selectedOrders.length} selected)
+                </Label>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">
+                  Select
+                </TableHead>
                 <TableHead>Order ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Products</TableHead>
@@ -439,9 +568,18 @@ export default function AllOrderData() {
               {orders.map((order) => {
                 const statusBadge = getStatusBadge(order.orderStatus)
                 const paymentBadge = getPaymentStatusBadge(order.paymentStatus)
+                const isSelected = selectedOrders.includes(order._id)
                 
                 return (
-                  <TableRow key={order._id}>
+                  <TableRow key={order._id} className={isSelected ? 'bg-blue-50' : ''}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleOrderSelection(order._id)}
+                        className="rounded border-gray-300"
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex flex-col">
                         <span className="font-semibold">{order.orderId}</span>
@@ -518,18 +656,41 @@ export default function AllOrderData() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleViewOrder(order)}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditOrder(order)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Order
-                          </DropdownMenuItem>
+                          <Link href={`/dashboard/orders/details/${order._id}`}>
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link href={`/dashboard/orders/edit/${order._id}`}>
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Order
+                            </DropdownMenuItem>
+                          </Link>
                           <DropdownMenuItem onClick={() => handlePrintOrder(order)}>
                             <Printer className="h-4 w-4 mr-2" />
                             Print Receipt
                           </DropdownMenuItem>
+                          {!order.trackingId && (
+                            <DropdownMenuItem 
+                              onClick={() => handleCreateSteadfastOrder(order)}
+                              disabled={creatingSteadfast}
+                            >
+                              {creatingSteadfast ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <Truck className="h-4 w-4 mr-2" />
+                              )}
+                              Create Steadfast
+                            </DropdownMenuItem>
+                          )}
+                          {order.trackingId && (
+                            <DropdownMenuItem className="text-green-600">
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Steadfast Created
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             onClick={() => {
@@ -721,6 +882,15 @@ export default function AllOrderData() {
                   </div>
                 </CardContent>
               </Card>
+
+              <DialogFooter>
+                <Link href={`/dashboard/orders/edit/${selectedOrder._id}`}>
+                  <Button>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Order
+                  </Button>
+                </Link>
+              </DialogFooter>
             </div>
           )}
         </DialogContent>
@@ -862,93 +1032,281 @@ export default function AllOrderData() {
       </AlertDialog>
 
       {/* Print Receipt Dialog */}
-      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
-        <DialogContent className="max-w-2xl">
+<Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+  <DialogContent className="max-w-2xl">
+    <DialogHeader>
+      <DialogTitle>Order Receipt - {selectedOrder?.orderId}</DialogTitle>
+    </DialogHeader>
+    
+    {selectedOrder && (
+      <>
+        {/* Receipt content for display */}
+        <div className="space-y-6">
+          {/* Receipt Header */}
+          <div className="text-center border-b pb-4">
+            {process.env.NEXT_PUBLIC_LOGO && (
+              <Image
+                src={process.env.NEXT_PUBLIC_LOGO}
+                alt="Shop Logo"
+                width={80}
+                height={80}
+                className="mx-auto mb-2"
+              />
+            )}
+            <h2 className="text-2xl font-bold">{process.env.NEXT_PUBLIC_NAME || 'Our Shop'}</h2>
+            <p className="text-muted-foreground">Order Receipt</p>
+          </div>
+
+          {/* Order Information */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <strong>Order ID:</strong> {selectedOrder.orderId}
+            </div>
+            <div>
+              <strong>Date:</strong> {formatDate(selectedOrder.createdAt)}
+            </div>
+            <div>
+              <strong>Customer:</strong> {selectedOrder.name}
+            </div>
+            <div>
+              <strong>Phone:</strong> {selectedOrder.number}
+            </div>
+          </div>
+
+          {/* Products */}
+          <div>
+            <h3 className="font-semibold mb-2">Order Items:</h3>
+            <div className="space-y-2">
+              {selectedOrder.products.map((product, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span>{product.name}</span>
+                  <span>{formatCurrency(product.generalPrice.currentPrice)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pricing Summary */}
+          <div className="border-t pt-2 space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>{formatCurrency(selectedOrder.totalAmount)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Delivery:</span>
+              <span>{formatCurrency(selectedOrder.deliveryCharge)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Discount:</span>
+              <span>-{formatCurrency(selectedOrder.discount)}</span>
+            </div>
+            <div className="flex justify-between font-bold text-base border-t pt-2">
+              <span>Total:</span>
+              <span>{formatCurrency(selectedOrder.grandTotal)}</span>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center text-xs text-muted-foreground border-t pt-4">
+            <p>Thank you for your business!</p>
+            <p>For any queries, contact: {selectedOrder.number}</p>
+          </div>
+        </div>
+
+        {/* Hidden receipt content for printing only */}
+        <div id="receipt-print-content" className="hidden">
+          <div className="p-8 max-w-md mx-auto">
+            {/* Receipt Header */}
+            <div className="text-center border-b-2 border-gray-800 pb-4 mb-6">
+               <Image width={100} height={100}
+                  src='/logo.png'
+                  alt="Shop Logo" 
+                  className="h-16 w-16 mx-auto mb-2 object-contain"
+                />
+              <h2 className="text-xl font-bold">{process.env.NEXT_PUBLIC_NAME || 'Our Shop'}</h2>
+              <p className="text-sm text-gray-600">Order Receipt</p>
+            </div>
+
+            {/* Order Information */}
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-sm">
+                <span><strong>Order ID:</strong></span>
+                <span>{selectedOrder.orderId}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span><strong>Date:</strong></span>
+                <span>{formatDate(selectedOrder.createdAt)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span><strong>Customer:</strong></span>
+                <span>{selectedOrder.name}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span><strong>Phone:</strong></span>
+                <span>{selectedOrder.number}</span>
+              </div>
+            </div>
+
+            {/* Products */}
+            <div className="mb-4">
+              <h3 className="font-semibold text-sm mb-2 border-b border-gray-300 pb-1">Order Items:</h3>
+              <div className="space-y-1">
+                {selectedOrder.products.map((product, index) => (
+                  <div key={index} className="flex justify-between text-xs">
+                    <span className="flex-1">{product.name}</span>
+                    <span className="ml-2">{formatCurrency(product.generalPrice.currentPrice)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing Summary */}
+            <div className="border-t-2 border-gray-800 pt-2 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(selectedOrder.totalAmount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Delivery:</span>
+                <span>{formatCurrency(selectedOrder.deliveryCharge)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Discount:</span>
+                <span>-{formatCurrency(selectedOrder.discount)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-base border-t border-gray-300 mt-2 pt-2">
+                <span>Total:</span>
+                <span>{formatCurrency(selectedOrder.grandTotal)}</span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-xs text-gray-500 border-t border-gray-300 mt-4 pt-4">
+              <p>Thank you for your business!</p>
+              <p>For any queries, contact: {selectedOrder.number}</p>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setPrintDialogOpen(false)}>
+        Close
+      </Button>
+      <Button onClick={() => {
+        const printContent = document.getElementById('receipt-print-content');
+        const originalContents = document.body.innerHTML;
+        
+        if (printContent) {
+          document.body.innerHTML = printContent.innerHTML;
+          window.print();
+          document.body.innerHTML = originalContents;
+          window.location.reload();
+        }
+      }} className="gap-2">
+        <Printer className="h-4 w-4" />
+        Print Receipt
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+      {/* Steadfast Success Dialog */}
+      <Dialog open={steadfastDialogOpen} onOpenChange={setSteadfastDialogOpen}>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Order Receipt - {selectedOrder?.orderId}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle className="h-5 w-5" />
+              Steadfast Order Created
+            </DialogTitle>
           </DialogHeader>
-          
           {selectedOrder && (
-            <div className="space-y-6" id="receipt-content">
-              {/* Receipt Header */}
-              <div className="text-center border-b pb-4">
-                {process.env.NEXT_PUBLIC_LOGO && (
-                  <Image
-                    src={process.env.NEXT_PUBLIC_LOGO}
-                    alt="Shop Logo"
-                    width={80}
-                    height={80}
-                    className="mx-auto mb-2"
-                  />
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800">
+                  Order <strong>{selectedOrder.orderId}</strong> has been successfully created in Steadfast Courier.
+                </p>
+                {selectedOrder.trackingId && (
+                  <p className="text-sm text-green-800 mt-2">
+                    <strong>Tracking ID:</strong> {selectedOrder.trackingId}
+                  </p>
                 )}
-                <h2 className="text-2xl font-bold">{process.env.NEXT_PUBLIC_NAME || 'Our Shop'}</h2>
-                <p className="text-muted-foreground">Order Receipt</p>
               </div>
-
-              {/* Order Information */}
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <strong>Order ID:</strong> {selectedOrder.orderId}
-                </div>
-                <div>
-                  <strong>Date:</strong> {formatDate(selectedOrder.createdAt)}
-                </div>
-                <div>
-                  <strong>Customer:</strong> {selectedOrder.name}
-                </div>
-                <div>
-                  <strong>Phone:</strong> {selectedOrder.number}
-                </div>
-              </div>
-
-              {/* Products */}
-              <div>
-                <h3 className="font-semibold mb-2">Order Items:</h3>
-                <div className="space-y-2">
-                  {selectedOrder.products.map((product, index) => (
-                    <div key={index} className="flex justify-between text-sm">
-                      <span>{product.name}</span>
-                      <span>{formatCurrency(product.generalPrice.currentPrice)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pricing Summary */}
-              <div className="border-t pt-2 space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>{formatCurrency(selectedOrder.totalAmount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Delivery:</span>
-                  <span>{formatCurrency(selectedOrder.deliveryCharge)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Discount:</span>
-                  <span>-{formatCurrency(selectedOrder.discount)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-base border-t pt-2">
-                  <span>Total:</span>
-                  <span>{formatCurrency(selectedOrder.grandTotal)}</span>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="text-center text-xs text-muted-foreground border-t pt-4">
-                <p>Thank you for your business!</p>
-                <p>For any queries, contact: {selectedOrder.number}</p>
+              <div className="text-sm text-muted-foreground">
+                The order status has been updated to ``Confirmed`` and tracking information has been added.
               </div>
             </div>
           )}
+          <DialogFooter>
+            <Button onClick={() => setSteadfastDialogOpen(false)}>
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Steadfast Dialog */}
+      <Dialog open={bulkSteadfastDialogOpen} onOpenChange={setBulkSteadfastDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Truck className="h-5 w-5" />
+              Create Bulk Steadfast Orders
+            </DialogTitle>
+            <DialogDescription>
+              Create Steadfast courier orders for {selectedOrders.length} selected orders
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                This will create Steadfast courier orders for all selected orders. 
+                Orders that already have tracking IDs will be skipped.
+              </p>
+            </div>
+
+            <div className="max-h-60 overflow-y-auto">
+              <h4 className="font-semibold text-sm mb-2">Selected Orders:</h4>
+              <div className="space-y-2">
+                {orders
+                  .filter(order => selectedOrders.includes(order._id))
+                  .map(order => (
+                    <div key={order._id} className="flex items-center justify-between text-sm p-2 border rounded">
+                      <span>{order.orderId}</span>
+                      {order.trackingId ? (
+                        <Badge variant="outline" className="text-green-600">
+                          Has Tracking
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">Ready</Badge>
+                      )}
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPrintDialogOpen(false)}>
-              Close
+            <Button 
+              variant="outline" 
+              onClick={() => setBulkSteadfastDialogOpen(false)}
+              disabled={creatingBulkSteadfast}
+            >
+              Cancel
             </Button>
-            <Button onClick={() => window.print()} className="gap-2">
-              <Printer className="h-4 w-4" />
-              Print Receipt
+            <Button 
+              onClick={handleBulkCreateSteadfastOrders}
+              disabled={creatingBulkSteadfast}
+              className="gap-2"
+            >
+              {creatingBulkSteadfast && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              <Truck className="h-4 w-4" />
+              Create {selectedOrders.length} Orders
             </Button>
           </DialogFooter>
         </DialogContent>

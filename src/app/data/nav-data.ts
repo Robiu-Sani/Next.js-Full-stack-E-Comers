@@ -1,13 +1,12 @@
 import {
   AudioWaveform,
-  BookOpen,
   Bot,
   Command,
   FolderClosed,
   FolderPlus,
   Frame,
   GalleryVerticalEnd,
-  Map,
+  Home,
   PieChart,
   Settings2,
   //   SquareTerminal,
@@ -41,7 +40,6 @@ export const data = {
       title: "Manage Data",
       url: "#",
       icon: FolderClosed,
-      isActive: true,
       items: [
         {
           title: "Products",
@@ -96,11 +94,14 @@ export const data = {
       title: "Manage Order",
       url: "#",
       icon: FolderClosed,
-      isActive: true,
       items: [
         {
           title: "All Orders",
           url: "/dashboard/orders",
+        },
+        {
+          title: "Steadfast Data",
+          url: "/dashboard/steadfast",
         },
        
       ],
@@ -124,50 +125,25 @@ export const data = {
         },
       ],
     },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
+   
     {
       title: "Settings",
       url: "#",
       icon: Settings2,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Calculator",
+          url: "/dashboard/calculator",
         },
         {
-          title: "Team",
-          url: "#",
+          title: "Calendar",
+          url: "/dashboard/calendar",
         },
         {
-          title: "Billing",
-          url: "#",
+          title: "Personal Note",
+          url: "/dashboard/personal-note",
         },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        
       ],
     },
   ],
@@ -178,14 +154,14 @@ export const data = {
       icon: Frame,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
+      name: "Product Report",
+      url: "/dashboard/product-report",
       icon: PieChart,
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Home",
+      url: "/",
+      icon: Home,
     },
   ],
 };

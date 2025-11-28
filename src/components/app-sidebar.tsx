@@ -14,18 +14,33 @@ import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { data } from "@/app/data/nav-data";
 import useContextData from "@/defaults/custom-component/useContextData";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { UserData } = useContextData();
   const router = useRouter();
+  const pathname = usePathname();
+
   React.useEffect(() => {
-    if (UserData) {
-      router.push(UserData.role == "user" ? "/profile" : "/dashboard");
-    } else {
+    if (!UserData) {
       router.push("/");
+      return;
     }
-  }, [UserData, router]);
+
+    const role = UserData.role;
+
+    if (role === "user") {
+      // allow: /profile, /profile/anything
+      if (!pathname.startsWith("/profile")) {
+        router.push("/profile");
+      }
+    } else {
+      // allow: /dashboard, /dashboard/anything
+      if (!pathname.startsWith("/dashboard")) {
+        router.push("/dashboard");
+      }
+    }
+  }, [UserData, pathname, router]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

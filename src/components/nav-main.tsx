@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Group, House, type LucideIcon } from "lucide-react";
+import { ChevronRight, TvMinimal, type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
@@ -40,17 +40,8 @@ export function NavMain({
         <SidebarMenuItem>
           <SidebarMenuButton asChild tooltip="Dashboard">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <Group className="w-4 h-4" />
+              <TvMinimal  className="w-4 h-4" />
               <span>Dashboard</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-
-        <SidebarMenuItem>
-          <SidebarMenuButton asChild tooltip="Home">
-            <Link href="/" className="flex items-center gap-2">
-              <House className="w-4 h-4" />
-              <span>Home</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
