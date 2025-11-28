@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, TvMinimal, type LucideIcon } from "lucide-react";
+import { Album, ChevronRight, TvMinimal, type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
@@ -77,6 +77,15 @@ export function NavMain({
             </SidebarMenuItem>
           </Collapsible>
         ))}
+
+        <SidebarMenuItem>
+          <SidebarMenuButton asChild tooltip="order-analysis">
+            <Link href="/dashboard/order-analysis" className="flex items-center gap-2">
+              <Album   className="w-4 h-4" />
+              <span>Order Analysis</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );
