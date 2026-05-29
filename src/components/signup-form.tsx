@@ -34,7 +34,7 @@ const registerData = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-    cache: "no-store",
+    
   });
 
   if (!response.ok) {

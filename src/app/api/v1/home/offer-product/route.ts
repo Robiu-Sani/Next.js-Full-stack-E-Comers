@@ -34,7 +34,12 @@ export async function GET(request: NextRequest) {
         status: "success",
         products,
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=28800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("GET products with offer error:", err);

@@ -51,7 +51,12 @@ export async function GET(request: NextRequest) {
         status: "success",
         navItems,
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=100800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("GET categories error:", err);

@@ -73,7 +73,7 @@ export default function CategoryTable() {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 
@@ -133,7 +133,7 @@ export default function CategoryTable() {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
         const updatedData = await res.json();
@@ -340,7 +340,7 @@ export default function CategoryTable() {
                   {
                     method: "GET",
                     credentials: "include",
-                    cache: "no-store",
+                    
                   }
                 )
                   .then((res) => res.json())

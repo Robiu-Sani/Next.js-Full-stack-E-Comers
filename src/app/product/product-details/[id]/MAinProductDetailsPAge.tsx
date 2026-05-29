@@ -136,12 +136,13 @@ export default function MainProductDetailsPage() {
         const res = await fetch(`/api/v1/product/status/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch product");
-        }
+        
+        // if (!res.ok) {
+        //   throw new Error("Failed to fetch product");
+        // }
 
         const data: ApiResponse = await res.json();
         if (data.success) {

@@ -20,7 +20,7 @@ const getData = async (path: string) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      cache: "no-store", // Add this to prevent caching of authenticated requests
+       // Add this to prevent caching of authenticated requests
     });
 
     // Handle HTTP errors

@@ -322,7 +322,7 @@ export default function DashboardInventory() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventory Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Inventory </h1>
           <p className="text-muted-foreground">
             Comprehensive inventory analytics and stock management overview
           </p>

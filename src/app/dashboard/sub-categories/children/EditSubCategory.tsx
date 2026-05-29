@@ -58,7 +58,7 @@ export default function EditSubCategory({
         const subCatRes = await fetch(`/api/v1/sub-category/${subCategoryId}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
         const subCatData = await subCatRes.json();
 
@@ -77,7 +77,7 @@ export default function EditSubCategory({
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
         const catData = await catRes.json();
@@ -132,7 +132,7 @@ export default function EditSubCategory({
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        cache: "no-store",
+        
       });
 
       const data = await res.json();

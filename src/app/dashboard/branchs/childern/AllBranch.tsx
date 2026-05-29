@@ -102,7 +102,7 @@ export default function AllBranch() {
         {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         }
       );
 

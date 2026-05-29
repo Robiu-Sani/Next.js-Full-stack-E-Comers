@@ -97,7 +97,7 @@ export default function UserProfile() {
       const res = await fetch(`/api/v1/profile`, {
         method: "GET",
         credentials: "include",
-        cache: "no-store",
+        
       });
       if (res.statusText == "Not Found" || res.status == 404) {
         router.push("/complete-account");

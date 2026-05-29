@@ -38,7 +38,7 @@ export default function FeaturedProducts() {
       try {
         const res = await fetch(`/api/v1/home/featured-product`, {
           method: "GET",
-          cache: "no-store",
+          
         });
         const data = await res.json();
         if (data.status === "success") {

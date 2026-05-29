@@ -52,7 +52,7 @@ export default function EditCategory({
         const res = await fetch(`/api/v1/category/${categoryId}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data: ApiResponse = await res.json();
@@ -116,7 +116,7 @@ export default function EditCategory({
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse = await res.json();

@@ -119,7 +119,7 @@ const ProductForm = () => {
         },
         credentials: "include",
         body: JSON.stringify(formattedData),
-        cache: "no-store",
+        
       });
 
       if (!res.ok) {

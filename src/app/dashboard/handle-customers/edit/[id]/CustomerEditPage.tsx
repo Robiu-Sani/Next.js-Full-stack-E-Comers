@@ -99,7 +99,7 @@ export default function CustomerEditPage() {
         const res = await fetch(`/api/v1/customer/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data: ApiResponse = await res.json();

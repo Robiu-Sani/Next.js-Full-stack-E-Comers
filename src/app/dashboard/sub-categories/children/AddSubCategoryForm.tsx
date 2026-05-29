@@ -63,7 +63,7 @@ export default function AddSubCategoryForm() {
         const res = await fetch(url, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data: ApiResponse<ICategory[]> = await res.json();
@@ -122,7 +122,7 @@ export default function AddSubCategoryForm() {
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse<ISubCategory> = await res.json();

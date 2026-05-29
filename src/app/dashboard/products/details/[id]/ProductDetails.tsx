@@ -92,7 +92,7 @@ export default function ProductDetails() {
         const res = await fetch(`/api/v1/product/status/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         if (!res.ok) {

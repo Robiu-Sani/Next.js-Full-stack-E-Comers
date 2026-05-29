@@ -96,7 +96,7 @@ export default function EditProductPage() {
         const res = await fetch(`/api/v1/product/status/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         if (!res.ok) {
@@ -171,7 +171,7 @@ export default function EditProductPage() {
         },
         credentials: "include",
         body: JSON.stringify(formattedData),
-        cache: "no-store",
+        
       });
 
       if (!res.ok) {

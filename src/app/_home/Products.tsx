@@ -28,7 +28,7 @@ export default function Products() {
       try {
         const res = await fetch(`/api/v1/home/product`, {
           method: "GET",
-          cache: "no-store",
+          
         });
         const data = await res.json();
         if (data.status === "success") {

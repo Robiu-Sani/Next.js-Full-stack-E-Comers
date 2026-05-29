@@ -100,7 +100,7 @@ export default function EditBranchForm() {
         const res = await fetch(`/api/v1/branch/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data: ApiResponse = await res.json();
@@ -183,7 +183,7 @@ export default function EditBranchForm() {
         },
         credentials: "include",
         body: JSON.stringify(formattedData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse = await res.json();

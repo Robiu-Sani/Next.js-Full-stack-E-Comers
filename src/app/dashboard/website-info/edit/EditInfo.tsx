@@ -83,7 +83,7 @@ export default function EditInfo() {
         const res = await fetch("/api/v1/web-info", {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const result = await res.json();

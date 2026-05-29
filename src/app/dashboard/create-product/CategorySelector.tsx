@@ -79,7 +79,7 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 
@@ -109,7 +109,7 @@ const CategorySelector = ({ form }: CategorySelectorProps) => {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 

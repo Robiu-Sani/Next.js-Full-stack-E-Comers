@@ -164,7 +164,12 @@ async function getLowStockProducts(request: NextRequest) {
     }
   };
 
-  return NextResponse.json(response, { status: 200 });
+  return NextResponse.json(response, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      });
 }
 
 // Function to get low stock statistics
@@ -258,7 +263,12 @@ async function getLowStockStatistics() {
         byCategory: categoryStats
       }
     },
-    { status: 200 }
+    { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
   );
 }
 
@@ -298,7 +308,12 @@ async function getCriticalStock(request: NextRequest) {
       data: transformedProducts,
       message: `Found ${transformedProducts.length} critically low stock products`
     },
-    { status: 200 }
+    { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
   );
 }
 
@@ -344,7 +359,12 @@ export async function POST(request: NextRequest) {
           category: (updatedProduct.category as any)?.name || "Uncategorized"
         }
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
     );
 
   } catch (error: any) {

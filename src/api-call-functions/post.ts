@@ -22,7 +22,7 @@ const postData = async (path: string, data: any) => {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(data),
-      cache: "no-store", // Prevent caching of authenticated requests
+       // Prevent caching of authenticated requests
     });
 
     // Handle HTTP errors

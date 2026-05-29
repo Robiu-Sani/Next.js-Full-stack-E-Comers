@@ -36,7 +36,7 @@ export default function HomeOffersProducts() {
       try {
         const res = await fetch(`/api/v1/home/offer-product`, {
           method: "GET",
-          cache: "no-store",
+          
         });
         const data = await res.json();
         if (data.status === "success") {

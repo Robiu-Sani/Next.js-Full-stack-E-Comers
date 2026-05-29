@@ -105,7 +105,7 @@ export default function MenageFeatureProducts() {
         const res = await fetch(`/api/v1/product/featured?${params}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         if (!res.ok) {

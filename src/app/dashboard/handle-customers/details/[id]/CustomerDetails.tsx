@@ -92,7 +92,7 @@ export default function CustomerDetails() {
         const res = await fetch(`/api/v1/customer/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data = await res.json();

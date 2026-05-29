@@ -101,7 +101,7 @@ export default function ProductsTable() {
         const res = await fetch(url, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data = await res.json();
@@ -161,7 +161,7 @@ export default function ProductsTable() {
         const res = await fetch(url, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
         const updatedData = await res.json();
         if (updatedData.success) {

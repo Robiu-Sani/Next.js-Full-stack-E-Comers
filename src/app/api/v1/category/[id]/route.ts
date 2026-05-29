@@ -27,7 +27,12 @@ export async function GET(req: NextRequest, context: ParamsType) {
       );
     }
 
-    return NextResponse.json({ success: true, data: category });
+    return NextResponse.json({ success: true, data: category } ,{ 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || "Failed to fetch category" },

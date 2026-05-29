@@ -28,8 +28,6 @@ export async function POST(request: NextRequest) {
       $or: [{ email: identifier }, { number: identifier }],
     });
 
-    console.log(user);
-
     if (!user || user.isDeleted) {
       return NextResponse.json(
         { success: false, message: "User not found." },

@@ -16,7 +16,12 @@ export async function GET() {
         success: true,
         data: categories,
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=28800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("GET Category error:", err);

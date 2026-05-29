@@ -15,7 +15,6 @@ export default function useGetWebsiteInfo() {
     try {
       const res = await fetch("/api/v1/web-info", {
         method: "GET",
-        cache: "no-store",
       });
 
       const result = await res.json();

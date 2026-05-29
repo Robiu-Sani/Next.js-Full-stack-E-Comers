@@ -99,7 +99,7 @@ const EditCategorySelector = ({ form }: CategorySelectorProps) => {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 
@@ -133,7 +133,7 @@ const EditCategorySelector = ({ form }: CategorySelectorProps) => {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 

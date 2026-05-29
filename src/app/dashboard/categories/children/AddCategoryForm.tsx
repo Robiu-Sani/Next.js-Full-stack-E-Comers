@@ -56,7 +56,7 @@ export default function AddCategoryForm() {
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse = await res.json();

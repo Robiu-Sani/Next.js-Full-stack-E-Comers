@@ -28,7 +28,12 @@ export async function GET(request: NextRequest, context: ParamsType) {
         { status: 404 }
       );
     }
-    return NextResponse.json({ success: true, data: customer });
+    return NextResponse.json({ success: true, data: customer }, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      });
   } catch (err) {
     console.error("GET customer error:", err);
     return NextResponse.json(

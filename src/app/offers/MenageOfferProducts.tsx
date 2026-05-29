@@ -105,7 +105,7 @@ export default function MenageOfferProducts() {
         const res = await fetch(`/api/v1/product/offers?${params}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         if (!res.ok) {

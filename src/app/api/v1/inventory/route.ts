@@ -183,7 +183,12 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      });
 
   } catch (error: any) {
     console.error("Inventory dashboard error:", error);

@@ -126,7 +126,12 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(response, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=100800', 
+        }
+      });
 
   } catch (error: any) {
     console.error("Order analysis error:", error);
@@ -463,7 +468,12 @@ export async function POST(request: NextRequest) {
       success: true,
       data: analysisData,
       period: { startDate, endDate }
-    }, { status: 200 });
+    }, { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      });
 
   } catch (error: any) {
     console.error("Custom analysis error:", error);

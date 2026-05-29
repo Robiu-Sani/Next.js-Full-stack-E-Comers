@@ -87,7 +87,7 @@ export default function UserTable() {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
 
@@ -153,7 +153,7 @@ export default function UserTable() {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
         const updatedData = await res.json();
@@ -204,7 +204,7 @@ export default function UserTable() {
           {
             method: "GET",
             credentials: "include",
-            cache: "no-store",
+            
           }
         );
         const updatedData = await res.json();

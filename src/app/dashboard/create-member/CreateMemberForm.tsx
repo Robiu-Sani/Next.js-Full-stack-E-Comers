@@ -236,7 +236,7 @@ export default function CreateMemberForm() {
         },
         credentials: "include",
         body: JSON.stringify(submitData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse = await res.json();

@@ -102,7 +102,7 @@ const CompleteProfile = () => {
         },
         credentials: "include",
         body: JSON.stringify(formData),
-        cache: "no-store",
+        
       });
 
       if (res.ok) {

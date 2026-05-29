@@ -68,7 +68,12 @@ export async function GET(request: NextRequest) {
           totalPages: Math.ceil(total / limit),
         },
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("GET Category error:", err);

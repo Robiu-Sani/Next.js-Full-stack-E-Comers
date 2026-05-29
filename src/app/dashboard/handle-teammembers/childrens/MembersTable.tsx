@@ -82,7 +82,7 @@ export default function MembersTable() {
         {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         }
       );
 

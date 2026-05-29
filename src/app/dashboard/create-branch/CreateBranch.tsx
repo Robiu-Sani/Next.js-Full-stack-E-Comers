@@ -117,7 +117,7 @@ export default function CreateBranch() {
         },
         credentials: "include",
         body: JSON.stringify(formattedData),
-        cache: "no-store",
+        
       });
 
       const data: ApiResponse = await res.json();

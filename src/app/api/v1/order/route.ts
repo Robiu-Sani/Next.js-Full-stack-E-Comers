@@ -332,7 +332,12 @@ export async function GET(request: NextRequest) {
           sortOrder: sortOrder === 'asc' ? 'asc' : 'desc'
         }
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=360', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("GET Orders error:", err);

@@ -104,7 +104,7 @@ export default function MemberEditPage() {
         const res = await fetch(`/api/v1/management/${id}`, {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         });
 
         const data: ApiResponse = await res.json();

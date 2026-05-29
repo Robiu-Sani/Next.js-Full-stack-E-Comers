@@ -106,7 +106,12 @@ export async function GET(request: NextRequest) {
         success: true,
         data: customer,
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("Error fetching customer profile:", err);
@@ -167,7 +172,12 @@ export async function PUT(request: NextRequest) {
         message: "Profile updated successfully",
         data: updatedCustomer,
       },
-      { status: 200 }
+      { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, max-age=10800', 
+        }
+      }
     );
   } catch (err: any) {
     console.error("Error updating customer profile:", err);

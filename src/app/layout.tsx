@@ -8,6 +8,7 @@ import NextTopLoader from "nextjs-toploader";
 import Context from "@/defaults/context/Context";
 import ThemeProvider from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import ChatbotComponent from "@/defaults/ChatbotComponent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
             <Context>
               <Toaster className="z-[999999]" />
               <ParentNav />
+              <ChatbotComponent />
               {children}
               <ParentFooter />
             </Context>

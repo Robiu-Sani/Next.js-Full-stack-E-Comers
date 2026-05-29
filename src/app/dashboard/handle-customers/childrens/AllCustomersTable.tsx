@@ -83,7 +83,7 @@ export default function AllCustomersTable() {
         {
           method: "GET",
           credentials: "include",
-          cache: "no-store",
+          
         }
       );
 
