@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
+import nextPWA from "next-pwa";
+
+const withPWA = nextPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
 const nextConfig: NextConfig = {
+  turbopack: {},
+
   /* config options here */
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -11,7 +21,7 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
-  
+
   images: {
     remotePatterns: [
       {
@@ -26,4 +36,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
